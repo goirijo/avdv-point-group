@@ -18,7 +18,7 @@ Running
 ```
 avdv-find-point-group triangular.txt
 ```
-outputs (trucated):
+outputs (truncated):
 ```
 The 12 operations of the lattice are:
 
