@@ -1,10 +1,16 @@
-#include <iostream>
 #include "symmetry.hpp"
 #include "math.hpp"
 #include "xtal.hpp"
+#include <iostream>
 
 namespace sym
 {
+
+Operation Operation::operator*(const Operation& other) const
+{
+    auto product_mat = this->cartesian_matrix() * other.cartesian_matrix();
+    return Operation(product_mat);
+}
 
 /// Given a symmetry operation, determine what type of operation it is
 /// by inspecting its determinant
@@ -108,6 +114,22 @@ std::set<Operation> point_group(const xtal::Lattice& lattice)
     }
 
     return point_group_operations;
+}
+
+bool group_is_colsed(const std::set<Operation> sym_group)
+{
+    for (const auto op1 : sym_group)
+    {
+        for (const auto op2 : sym_group)
+        {
+            auto product = op1 * op2;
+            if(sym_group.find(product)==sym_group.end())
+            {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 } // namespace sym

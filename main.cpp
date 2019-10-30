@@ -1,9 +1,8 @@
-#include <iostream>
 #include "io.hpp"
-#include "xtal.hpp"
-#include "symmetry.hpp"
 #include "math.hpp"
-
+#include "symmetry.hpp"
+#include "xtal.hpp"
+#include <iostream>
 
 int main(int argc, char* argv[])
 {
@@ -36,10 +35,10 @@ int main(int argc, char* argv[])
 
     std::cout << "--------------" << std::endl;
 
-    for(const auto& op : point_group)
+    for (const auto& op : point_group)
     {
-        std::cout<<op.label()<<std::endl;
-        std::cout<<op.cartesian_matrix()<<std::endl<<std::endl;
+        std::cout << op.label() << std::endl;
+        std::cout << op.cartesian_matrix() << std::endl << std::endl;
     }
 
     std::cout << "--------------" << std::endl;
@@ -66,6 +65,20 @@ int main(int argc, char* argv[])
     std::cout << math::angle_between_vectors(lattice.a(), lattice.b()) << std::endl;
 
     std::cout << "--------------" << std::endl;
+
+    if (sym::group_is_colsed(point_group))
+    {
+        std::cout << "The group is closed." << std::endl;
+    }
+
+    else
+    {
+        std::cout << "The group is NOT closed !!!" << std::endl;
+        for (const auto& op : point_group)
+        {
+            std::cout << op.label() << std::endl;
+        }
+    }
 
     return 0;
 }

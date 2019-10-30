@@ -37,6 +37,9 @@ public:
     /// Result is simply a direct comparison of the label
     bool operator<(const Operation& other) const { return this->label() < other.label(); }
 
+    /// Take the product of two operations by multiplying the cartesian matrix
+    Operation operator*(const Operation& other) const;
+
 private:
     OperationMatrix m_cartesian_matrix;
 
