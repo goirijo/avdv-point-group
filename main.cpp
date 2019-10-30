@@ -4,7 +4,64 @@
 #include "xtal.hpp"
 #include <iostream>
 
+void big_divider()
+{
+    std::cout<<"-----------------------------------------------------"<<std::endl;
+    return;
+}
+
+void small_divider()
+{
+    std::cout<<"----------------"<<std::endl;
+    return;
+}
+
 int main(int argc, char* argv[])
+{
+    std::string lat_file(argv[1]);
+    auto lattice_mat = io::read_lattice_from_file(lat_file);
+
+    xtal::Lattice lattice(lattice_mat);
+
+    std::cout<<"The lattice vectors are:"<<std::endl;
+    std::cout << "a:    " << lattice.a().transpose() << std::endl;
+    std::cout << "b:    " << lattice.b().transpose() << std::endl;
+    big_divider();
+
+    auto point_group = sym::point_group(lattice);
+
+    std::cout<<"The point group operations are:"<<std::endl<<std::endl;
+    small_divider();
+    for (const auto& op : point_group)
+    {
+        std::cout << op.label() << std::endl;
+        std::cout << op.cartesian_matrix() << std::endl << std::endl;
+        small_divider();
+    }
+
+    big_divider();
+
+    if (sym::group_is_colsed(point_group))
+    {
+        std::cout << "The group is closed." << std::endl;
+    }
+
+    else
+    {
+        std::cout << "The group is NOT closed!!!" << std::endl;
+    }
+
+    std::cout<<"The multiplication table is:"<<std::endl;
+
+    auto multiplication_table=sym::make_multiplication_table(point_group);
+    io::print_formatted_table(std::cout, multiplication_table, 6);
+
+    big_divider();
+
+    return 0;
+}
+
+int testing(int argc, char* argv[])
 {
     std::string lat_file(argv[1]);
     auto lattice_mat = io::read_lattice_from_file(lat_file);
