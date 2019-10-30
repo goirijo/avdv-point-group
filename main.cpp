@@ -55,8 +55,30 @@ private:
     Eigen::Matrix2d vectors_as_columns_matrix;
 };
 
+///Return a vector of lattice points by extending the lattice maxsearch times in all directions.
+///This is basically just a list of lattice points within a certain radius of the origin,
+///where the radius is specified by number of unit cells.
+std::vector<LatticePoint> lattice_points_in_radius(const Lattice& lat, int search_radius)
+{
+    auto a_vector=lat.a();
+    auto b_vector=lat.b();
 
+    std::vector<LatticePoint> lattice_points;
+    for(int i=-search_radius; i<=search_radius; ++i)
+    {
+        for(int j=-search_radius; j<=search_radius; ++j)
+        {
+            auto point=i*a_vector+j*b_vector;
+            lattice_points.push_back(point);
+        }
+    }
+
+    return lattice_points;
+}
 } // namespace xtal
+
+
+
 
 int main(int argc, char* argv[])
 {
@@ -67,5 +89,12 @@ int main(int argc, char* argv[])
 
     std::cout << "a:    " << lattice.a().transpose() << std::endl;
     std::cout << "b:    " << lattice.b().transpose() << std::endl;
+
+    auto lattice_points=xtal::lattice_points_in_radius(lattice,3);
+    for(auto lp : lattice_points)
+    {
+        std::cout<<lp.transpose()<<std::endl;
+    }
+
     return 0;
 }
