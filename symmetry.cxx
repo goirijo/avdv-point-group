@@ -76,9 +76,9 @@ std::string Operation::make_label(const OperationMatrix& operation)
 
 /// Returns the point group of the given Lattice, i.e. the group of symmetry operations
 /// that maps the lattice onto itself.
-std::vector<Operation> point_group(const xtal::Lattice& lattice)
+std::set<Operation> point_group(const xtal::Lattice& lattice)
 {
-    std::vector<Operation> point_group_operations;
+    std::set<Operation> point_group_operations;
 
     // This radius should be more than enough
     auto lattice_points = xtal::lattice_points_in_radius(lattice, 5);
@@ -102,7 +102,7 @@ std::vector<Operation> point_group(const xtal::Lattice& lattice)
             if (math::matrix_determinant_magnitude_is_unity(possible_symmetry_operation) &&
                 math::matrix_is_unitary(possible_symmetry_operation))
             {
-                point_group_operations.emplace_back(possible_symmetry_operation);
+                point_group_operations.emplace(possible_symmetry_operation);
             }
         }
     }

@@ -1,12 +1,12 @@
 #ifndef SYMMETRY_HH
 #define SYMMETRY_HH
 
-#include <vector>
 #include "Eigen/Dense"
+#include <set>
 
 namespace xtal
 {
-    class Lattice;
+class Lattice;
 }
 
 namespace sym
@@ -25,17 +25,17 @@ public:
         UNDEFINED
     };
 
-    Operation(const OperationMatrix& cartesian_matrix) : m_cartesian_matrix(cartesian_matrix), operation_label(make_label(cartesian_matrix)) {}
-
-    const OperationMatrix& cartesian_matrix() const
+    Operation(const OperationMatrix& cartesian_matrix)
+        : m_cartesian_matrix(cartesian_matrix), operation_label(make_label(cartesian_matrix))
     {
-        return this->m_cartesian_matrix;
     }
 
-    std::string label() const
-    {
-        return this->operation_label;
-    }
+    const OperationMatrix& cartesian_matrix() const { return this->m_cartesian_matrix; }
+
+    std::string label() const { return this->operation_label; }
+
+    /// Result is simply a direct comparison of the label
+    bool operator<(const Operation& other) const { return this->label() < other.label(); }
 
 private:
     OperationMatrix m_cartesian_matrix;
@@ -57,9 +57,12 @@ private:
 
 /// Returns the point group of the given Lattice, i.e. the group of symmetry operations
 /// that maps the lattice onto itself.
-std::vector<Operation> point_group(const xtal::Lattice& lattice);
+std::set<Operation> point_group(const xtal::Lattice& lattice);
+
+/// Ensure that the symmetry group is closed by multiplying every element by every element
+/// and checking that the result is alrady in the group
+bool group_is_colsed(const std::set<Operation> sym_group);
 
 } // namespace sym
-
 
 #endif
