@@ -1,1 +1,1 @@
- g++ main.cpp -Ieigen-git-mirror -Werror
+ g++ main.cpp -Ieigen-git-mirror -Werror -Wreturn-type

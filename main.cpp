@@ -38,6 +38,7 @@ namespace xtal
 {
 
 typedef Eigen::Vector2d LatticePoint;
+typedef Eigen::Vector2d LatticeVector;
 
 class Lattice
 {
@@ -47,9 +48,29 @@ public:
     {
     }
 
-    Eigen::Vector2d a() const { return this->vectors_as_columns_matrix.col(0); }
+    Lattice(const LatticeVector& init_a, const LatticeVector& init_b):
+        vectors_as_columns_matrix(Lattice::vertical_stack(init_a,init_b))
+    {}
 
-    Eigen::Vector2d b() const { return this->vectors_as_columns_matrix.col(1); }
+    LatticeVector a() const { return this->vectors_as_columns_matrix.col(0); }
+
+    LatticeVector b() const { return this->vectors_as_columns_matrix.col(1); }
+
+    const Eigen::Matrix2d& vectors_as_columns() const
+    {
+        return this->vectors_as_columns_matrix;
+    }
+
+    static Eigen::Matrix2d vertical_stack(const LatticeVector& a, const LatticeVector& b)
+    {
+        Eigen::Matrix2d mat;
+        mat(0,0)=a(0);
+        mat(1,0)=a(1);
+        mat(0,1)=b(0);
+        mat(1,1)=b(1);
+
+        return mat;
+    }
 
 private:
     Eigen::Matrix2d vectors_as_columns_matrix;
@@ -77,6 +98,30 @@ std::vector<LatticePoint> lattice_points_in_radius(const Lattice& lat, int searc
 }
 } // namespace xtal
 
+/* namespace sym */
+/* { */
+/*     typedef Eigen::Matrix2d SymOperation; */
+
+/*     ///Returns the point group of the given Lattice, i.e. the group of symmetry operations */
+/*     ///that maps the lattice onto itself. */
+/*     std::vector<SymOperation> point_group(const xtal::Lattice& lattice) */
+/*     { */
+/*         std::vector<SymOperation> point_group_operations; */
+
+/*         //This radius should be more than enough */
+/*         auto lattice_points=xtal::lattice_points_in_radius(lattice, 5); */
+
+/*         for(const auto& p1 : lattice_points) */
+/*         { */
+/*             for(const auto& p2 : lattice_points) */
+/*             { */
+/*                 //Create a new lattice from the two points. */
+/*                 //Each of the points effectively defines the a and b vectors of the */
+/*                 //new lattice */
+/*             } */
+/*         } */
+/*     } */
+/* } */
 
 
 
@@ -95,6 +140,16 @@ int main(int argc, char* argv[])
     {
         std::cout<<lp.transpose()<<std::endl;
     }
+
+    std::cout<<"--------------"<<std::endl;
+
+    xtal::Lattice regen(lattice.a(),lattice.b());
+    std::cout<<regen.vectors_as_columns()-lattice.vectors_as_columns()<<std::endl;
+    std::cout<<"--------------"<<std::endl;
+    std::cout<<regen.vectors_as_columns()<<std::endl;
+    std::cout<<"--------------"<<std::endl;
+    std::cout<<lattice.vectors_as_columns()<<std::endl;
+
 
     return 0;
 }
