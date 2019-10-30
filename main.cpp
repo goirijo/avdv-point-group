@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-//This will be the tolerance for floating point comparison
+// This will be the tolerance for floating point comparison
 #define EPS 0.00001
 
 namespace io
@@ -51,26 +51,24 @@ public:
     {
     }
 
-    Lattice(const LatticeVector& init_a, const LatticeVector& init_b):
-        vectors_as_columns_matrix(Lattice::vertical_stack(init_a,init_b))
-    {}
+    Lattice(const LatticeVector& init_a, const LatticeVector& init_b)
+        : vectors_as_columns_matrix(Lattice::vertical_stack(init_a, init_b))
+    {
+    }
 
     LatticeVector a() const { return this->vectors_as_columns_matrix.col(0); }
 
     LatticeVector b() const { return this->vectors_as_columns_matrix.col(1); }
 
-    const Eigen::Matrix2d& vectors_as_columns() const
-    {
-        return this->vectors_as_columns_matrix;
-    }
+    const Eigen::Matrix2d& vectors_as_columns() const { return this->vectors_as_columns_matrix; }
 
     static Eigen::Matrix2d vertical_stack(const LatticeVector& a, const LatticeVector& b)
     {
         Eigen::Matrix2d mat;
-        mat(0,0)=a(0);
-        mat(1,0)=a(1);
-        mat(0,1)=b(0);
-        mat(1,1)=b(1);
+        mat(0, 0) = a(0);
+        mat(1, 0) = a(1);
+        mat(0, 1) = b(0);
+        mat(1, 1) = b(1);
 
         return mat;
     }
@@ -79,20 +77,20 @@ private:
     Eigen::Matrix2d vectors_as_columns_matrix;
 };
 
-///Return a vector of lattice points by extending the lattice maxsearch times in all directions.
-///This is basically just a list of lattice points within a certain radius of the origin,
-///where the radius is specified by number of unit cells.
+/// Return a vector of lattice points by extending the lattice maxsearch times in all directions.
+/// This is basically just a list of lattice points within a certain radius of the origin,
+/// where the radius is specified by number of unit cells.
 std::vector<LatticePoint> lattice_points_in_radius(const Lattice& lat, int search_radius)
 {
-    auto a_vector=lat.a();
-    auto b_vector=lat.b();
+    auto a_vector = lat.a();
+    auto b_vector = lat.b();
 
     std::vector<LatticePoint> lattice_points;
-    for(int i=-search_radius; i<=search_radius; ++i)
+    for (int i = -search_radius; i <= search_radius; ++i)
     {
-        for(int j=-search_radius; j<=search_radius; ++j)
+        for (int j = -search_radius; j <= search_radius; ++j)
         {
-            auto point=i*a_vector+j*b_vector;
+            auto point = i * a_vector + j * b_vector;
             lattice_points.push_back(point);
         }
     }
@@ -103,68 +101,63 @@ std::vector<LatticePoint> lattice_points_in_radius(const Lattice& lat, int searc
 
 namespace math
 {
-    bool almost_equal(double val1, double val2)
-    {
-        return std::abs(val1-val2)<EPS;
-    }
+bool almost_equal(double val1, double val2) { return std::abs(val1 - val2) < EPS; }
 
-    bool almost_equal(const Eigen::MatrixXd& mat1, const Eigen::MatrixXd& mat2)
-    {
-        mat1.isApprox(mat2,EPS);
-    }
+bool almost_equal(const Eigen::MatrixXd& mat1, const Eigen::MatrixXd& mat2) { return mat1.isApprox(mat2, EPS); }
 
-    bool determinant_magnitude_is_unity(const Eigen::MatrixXd& mat)
-    {
-        return almost_equal(std::abs(mat.determinant()),1);
-    }
-
-    //A matrix is unitary if the conjugate transpose is also the inverse
-    bool matrix_is_unitary(const Eigen::MatrixXd& mat)
-    {
-        auto identity=Eigen::MatrixXd::Identity(mat.rows(), mat.cols());
-        return almost_equal(mat*mat.transpose(),identity);
-    }
+bool matrix_determinant_magnitude_is_unity(const Eigen::MatrixXd& mat)
+{
+    return almost_equal(std::abs(mat.determinant()), 1);
 }
+
+// A matrix is unitary if the conjugate transpose is also the inverse
+bool matrix_is_unitary(const Eigen::MatrixXd& mat)
+{
+    auto identity = Eigen::MatrixXd::Identity(mat.rows(), mat.cols());
+    return almost_equal(mat * mat.transpose(), identity);
+}
+} // namespace math
 
 namespace sym
 {
-    typedef Eigen::Matrix2d SymOperation;
+typedef Eigen::Matrix2d SymOperation;
 
-    ///Returns the point group of the given Lattice, i.e. the group of symmetry operations
-    ///that maps the lattice onto itself.
-    std::vector<SymOperation> point_group(const xtal::Lattice& lattice)
+/// Returns the point group of the given Lattice, i.e. the group of symmetry operations
+/// that maps the lattice onto itself.
+std::vector<SymOperation> point_group(const xtal::Lattice& lattice)
+{
+    std::vector<SymOperation> point_group_operations;
+
+    // This radius should be more than enough
+    auto lattice_points = xtal::lattice_points_in_radius(lattice, 5);
+
+    for (const auto& p1 : lattice_points)
     {
-        std::vector<SymOperation> point_group_operations;
-
-        //This radius should be more than enough
-        auto lattice_points=xtal::lattice_points_in_radius(lattice, 5);
-
-        for(const auto& p1 : lattice_points)
+        for (const auto& p2 : lattice_points)
         {
-            for(const auto& p2 : lattice_points)
+            // Create a new lattice from the two points.
+            // Each of the points effectively defines the a and b vectors of the
+            // new lattice
+            xtal::Lattice possible_transformed_lattice(p1, p2);
+            // Find the transformation that takes you from the original lattice
+            // to this new lattice. The result is a candidate symmetry operation
+            const auto& orig_lat_mat = lattice.vectors_as_columns();
+            const auto& possible_lat_mat = possible_transformed_lattice.vectors_as_columns();
+            auto possible_symmetry_operation = possible_lat_mat * (orig_lat_mat.inverse());
+
+            // The candidate operation is only valid if its determinant magnitude is unity
+            // AND it is unitary
+            if (math::matrix_determinant_magnitude_is_unity(possible_symmetry_operation) &&
+                math::matrix_is_unitary(possible_symmetry_operation))
             {
-                //Create a new lattice from the two points.
-                //Each of the points effectively defines the a and b vectors of the
-                //new lattice
-                xtal::Lattice possible_transformed_lattice(p1,p2);
-                //Find the transformation that takes you from the original lattice
-                //to this new lattice. The result is a candidate symmetry operation
-                const auto& orig_lat_mat=lattice.vectors_as_columns();
-                const auto& possible_lat_mat=possible_transformed_lattice.vectors_as_columns();
-                auto possible_symmetry_operation=possible_lat_mat*(orig_lat_mat.inverse());
-
-                //The candidate operation is only valid if its determinant magnitude is unity
-                //AND it is unitary
-                if(std::abs(possible_symmetry_operation.determinant())==1)
-                {
-
-                }
+                point_group_operations.push_back(possible_symmetry_operation);
             }
         }
     }
+
+    return point_group_operations;
 }
-
-
+} // namespace sym
 
 int main(int argc, char* argv[])
 {
@@ -176,21 +169,23 @@ int main(int argc, char* argv[])
     std::cout << "a:    " << lattice.a().transpose() << std::endl;
     std::cout << "b:    " << lattice.b().transpose() << std::endl;
 
-    auto lattice_points=xtal::lattice_points_in_radius(lattice,3);
-    for(auto lp : lattice_points)
+    auto lattice_points = xtal::lattice_points_in_radius(lattice, 3);
+    for (auto lp : lattice_points)
     {
-        std::cout<<lp.transpose()<<std::endl;
+        std::cout << lp.transpose() << std::endl;
     }
 
-    std::cout<<"--------------"<<std::endl;
+    std::cout << "--------------" << std::endl;
 
-    xtal::Lattice regen(lattice.a(),lattice.b());
-    std::cout<<regen.vectors_as_columns()-lattice.vectors_as_columns()<<std::endl;
-    std::cout<<"--------------"<<std::endl;
-    std::cout<<regen.vectors_as_columns()<<std::endl;
-    std::cout<<"--------------"<<std::endl;
-    std::cout<<lattice.vectors_as_columns()<<std::endl;
+    xtal::Lattice regen(lattice.a(), lattice.b());
+    std::cout << regen.vectors_as_columns() - lattice.vectors_as_columns() << std::endl;
+    std::cout << "--------------" << std::endl;
+    std::cout << regen.vectors_as_columns() << std::endl;
+    std::cout << "--------------" << std::endl;
+    std::cout << lattice.vectors_as_columns() << std::endl;
 
-
+    std::cout << "--------------" << std::endl;
+    auto point_group=sym::point_group(lattice);
+    std::cout<<point_group.size()<<std::endl;
     return 0;
 }
