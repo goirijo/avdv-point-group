@@ -18,7 +18,7 @@ Running
 ```
 avdv-find-point-group triangular.txt
 ```
-outputs (trucated):
+outputs (truncated):
 ```
 The 12 operations of the lattice are:
 
@@ -65,7 +65,13 @@ The 12 operations of the lattice are:
 
 ## Bonus points
 * Well structured code (e.g. delegating tasks to functions or classes)
-* Readable code
+* Documentation, or better yet, readable code
+* `const` correctness
+* Use STL
+* Small, incremental commits, not one jumbo commit at the end!
 * Prove results are correct by showing group is closed
 * Print multiplication table of point group
 
+## Pitfalls to look out for
+* Floating point comparisons, think well before using `==` operator
+* Undefined behavior because you forgot to return the value at the end of your function
