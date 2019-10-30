@@ -3,6 +3,9 @@ Write an executable that calculates the point group operations of an arbitrary 2
 Lattice vectors must be inputted through a file, which contains the *a* and *b* vectors as columns.
 Your program should print out the size of the point group, followed by the Cartesian matrix representations for each operation.
 
+The `Eigen` library is provided as a submodule, so be sure to clone the repository properly and make use of it!
+It provides linear algebra routines that you will need.
+
 ## Example
 A file named `triangular.txt` contains the lattice vectors for a triangular lattice:
 ```
@@ -65,3 +68,4 @@ The 12 operations of the lattice are:
 * Readable code
 * Prove results are correct by showing group is closed
 * Print multiplication table of point group
+
