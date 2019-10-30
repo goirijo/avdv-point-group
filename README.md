@@ -75,3 +75,4 @@ The 12 operations of the lattice are:
 ## Pitfalls to look out for
 * Floating point comparisons, think well before using `==` operator
 * Undefined behavior because you forgot to return the value at the end of your function
+* You don't have the `Eigen` library in because you forgot to clone with `--recursive`
