@@ -65,7 +65,7 @@ private:
 
 /// Returns the point group of the given Lattice, i.e. the group of symmetry operations
 /// that maps the lattice onto itself.
-std::set<Operation> point_group(const xtal::Lattice& lattice);
+std::set<Operation> make_point_group(const xtal::Lattice& lattice);
 
 /// Ensure that the symmetry group is closed by multiplying every element by every element
 /// and checking that the result is alrady in the group

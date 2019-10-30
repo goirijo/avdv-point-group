@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
     std::cout << "b:    " << lattice.b().transpose() << std::endl;
     big_divider();
 
-    auto point_group = sym::point_group(lattice);
+    auto point_group = sym::make_point_group(lattice);
 
     std::cout<<"The point group operations are:"<<std::endl<<std::endl;
     small_divider();
