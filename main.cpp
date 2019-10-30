@@ -129,42 +129,6 @@ namespace sym
 {
 typedef Eigen::Matrix2d OperationMatrix;
 
-/// Returns the point group of the given Lattice, i.e. the group of symmetry operations
-/// that maps the lattice onto itself.
-std::vector<OperationMatrix> point_group(const xtal::Lattice& lattice)
-{
-    std::vector<OperationMatrix> point_group_operations;
-
-    // This radius should be more than enough
-    auto lattice_points = xtal::lattice_points_in_radius(lattice, 5);
-
-    for (const auto& p1 : lattice_points)
-    {
-        for (const auto& p2 : lattice_points)
-        {
-            // Create a new lattice from the two points.
-            // Each of the points effectively defines the a and b vectors of the
-            // new lattice
-            xtal::Lattice possible_transformed_lattice(p1, p2);
-            // Find the transformation that takes you from the original lattice
-            // to this new lattice. The result is a candidate symmetry operation
-            const auto& orig_lat_mat = lattice.vectors_as_columns();
-            const auto& possible_lat_mat = possible_transformed_lattice.vectors_as_columns();
-            auto possible_symmetry_operation = possible_lat_mat * (orig_lat_mat.inverse());
-
-            // The candidate operation is only valid if its determinant magnitude is unity
-            // AND it is unitary
-            if (math::matrix_determinant_magnitude_is_unity(possible_symmetry_operation) &&
-                math::matrix_is_unitary(possible_symmetry_operation))
-            {
-                point_group_operations.push_back(possible_symmetry_operation);
-            }
-        }
-    }
-
-    return point_group_operations;
-}
-
 class Operation
 {
 public:
@@ -179,7 +143,15 @@ public:
 
     Operation(const OperationMatrix& cartesian_matrix) : m_cartesian_matrix(cartesian_matrix), operation_label(make_label(cartesian_matrix)) {}
 
-    const OperationMatrix& cartesian_matrix() const;
+    const OperationMatrix& cartesian_matrix() const
+    {
+        return this->m_cartesian_matrix;
+    }
+
+    std::string label() const
+    {
+        return this->operation_label;
+    }
 
 private:
     OperationMatrix m_cartesian_matrix;
@@ -220,7 +192,9 @@ private:
         ref_vec << 1, 0;
 
         auto transformed_vec = operation * ref_vec;
-        return math::angle_between_vectors(ref_vec, transformed_vec);
+        auto angle=math::angle_between_vectors(ref_vec, transformed_vec);
+        auto positive_angle=(360+angle)%360;
+        return positive_angle;
     }
 
     /// Given a symmetry operation, return a string that identifies it by type of operation,
@@ -253,6 +227,43 @@ private:
     }
 };
 
+/// Returns the point group of the given Lattice, i.e. the group of symmetry operations
+/// that maps the lattice onto itself.
+std::vector<Operation> point_group(const xtal::Lattice& lattice)
+{
+    std::vector<Operation> point_group_operations;
+
+    // This radius should be more than enough
+    auto lattice_points = xtal::lattice_points_in_radius(lattice, 5);
+
+    for (const auto& p1 : lattice_points)
+    {
+        for (const auto& p2 : lattice_points)
+        {
+            // Create a new lattice from the two points.
+            // Each of the points effectively defines the a and b vectors of the
+            // new lattice
+            xtal::Lattice possible_transformed_lattice(p1, p2);
+            // Find the transformation that takes you from the original lattice
+            // to this new lattice. The result is a candidate symmetry operation
+            const auto& orig_lat_mat = lattice.vectors_as_columns();
+            const auto& possible_lat_mat = possible_transformed_lattice.vectors_as_columns();
+            auto possible_symmetry_operation = possible_lat_mat * (orig_lat_mat.inverse());
+
+            // The candidate operation is only valid if its determinant magnitude is unity
+            // AND it is unitary
+            if (math::matrix_determinant_magnitude_is_unity(possible_symmetry_operation) &&
+                math::matrix_is_unitary(possible_symmetry_operation))
+            {
+                point_group_operations.emplace_back(possible_symmetry_operation);
+            }
+        }
+    }
+
+    return point_group_operations;
+}
+
+
 } // namespace sym
 
 int main(int argc, char* argv[])
@@ -283,6 +294,14 @@ int main(int argc, char* argv[])
     std::cout << "--------------" << std::endl;
     auto point_group = sym::point_group(lattice);
     std::cout << point_group.size() << std::endl;
+
+    std::cout << "--------------" << std::endl;
+
+    for(const auto& op : point_group)
+    {
+        std::cout<<op.label()<<std::endl;
+        std::cout<<op.cartesian_matrix()<<std::endl<<std::endl;
+    }
 
     std::cout << "--------------" << std::endl;
 
