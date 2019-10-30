@@ -31,6 +31,8 @@ public:
     {
     }
 
+    static Operation undefined() { return Operation(OperationMatrix::Zero()); }
+
     const OperationMatrix& cartesian_matrix() const { return this->m_cartesian_matrix; }
 
     /// Return label that identifies the symmetry operation as identity, rotation, or mirror, as well
@@ -71,7 +73,10 @@ bool group_is_colsed(const std::set<Operation>& sym_group);
 
 /// Construct multiplication table of group by storing pointers to each element in the symmetry group
 /// in a two dimensional vector. Group must be closed!
-std::vector<std::vector<const Operation*>> make_multiplication_table(const std::set<Operation>& sym_group);
+std::vector<std::vector<Operation>> make_multiplication_table(const std::set<Operation>& sym_group);
+
+/// Outputs the label of the operation
+std::ostream& operator<<(std::ostream& stream, const Operation& op);
 
 } // namespace sym
 

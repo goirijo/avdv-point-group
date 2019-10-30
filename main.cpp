@@ -65,6 +65,9 @@ int main(int argc, char* argv[])
     std::cout << math::angle_between_vectors(lattice.a(), lattice.b()) << std::endl;
 
     std::cout << "--------------" << std::endl;
+    auto undefined_operation=sym::Operation::undefined();
+    std::cout<<undefined_operation.label()<<std::endl;
+    std::cout << "--------------" << std::endl;
 
     if (sym::group_is_colsed(point_group))
     {
@@ -81,15 +84,7 @@ int main(int argc, char* argv[])
     }
 
     auto multiplication_table=sym::make_multiplication_table(point_group);
-    for(const auto& row : multiplication_table)
-    {
-        for(auto op_ptr : row)
-        {
-            std::cout<<op_ptr->label()<<"    ";
-        }
-
-        std::cout<<std::endl;
-    }
+    io::print_formatted_table(std::cout, multiplication_table, 6);
 
     return 0;
 }

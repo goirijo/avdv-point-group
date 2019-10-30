@@ -71,6 +71,9 @@ std::string Operation::make_label(const OperationMatrix& operation)
     case TYPE::MIRROR:
         label = combine_to_string("M", angle);
         break;
+    case TYPE::UNDEFINED:
+        label = "UNDEFINED";
+        break;
     default:
         std::cerr << "Your symmetry operation coudn't be properly categorized. There's no recovering from this"
                   << std::endl;
@@ -78,6 +81,12 @@ std::string Operation::make_label(const OperationMatrix& operation)
     }
 
     return label;
+}
+
+std::ostream& operator<<(std::ostream& stream, const Operation& op)
+{
+    stream<<op.label();
+    return stream;
 }
 
 /// Returns the point group of the given Lattice, i.e. the group of symmetry operations
@@ -132,24 +141,19 @@ bool group_is_colsed(const std::set<Operation>& sym_group)
     return true;
 }
 
-std::vector<std::vector<const Operation*>> make_multiplication_table(const std::set<Operation>& sym_group)
+std::vector<std::vector<Operation>> make_multiplication_table(const std::set<Operation>& sym_group)
 {
-    std::vector<const Operation*> unrolled_group;
-    for(const auto& op : sym_group)
-    {
-        unrolled_group.push_back(&op);
-    }
+    std::vector<Operation> unrolled_group(sym_group.begin(),sym_group.end());
 
     int num_ops=unrolled_group.size();
-    std::vector<std::vector<const Operation*>> multiplication_table(num_ops, std::vector<const Operation*>(num_ops, nullptr));
+    std::vector<std::vector<Operation>> multiplication_table(num_ops, std::vector<Operation>(num_ops,Operation::undefined()));
 
     for (int i = 0; i < unrolled_group.size(); ++i)
     {
         for (int j = 0; j < unrolled_group.size(); ++j)
         {
-            Operation product=(*unrolled_group[i])*(*unrolled_group[j]);
-            auto product_it=sym_group.find(product);
-            multiplication_table[i][j]=&(*product_it);
+            Operation product=unrolled_group[i]*unrolled_group[j];
+            multiplication_table[i][j]=product;
         }
     }
 
