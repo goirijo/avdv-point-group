@@ -48,20 +48,23 @@ class Lattice
 {
 public:
     Lattice(const Eigen::Matrix2d& init_vectors_as_columns_matrix)
-        : vectors_as_columns_matrix(init_vectors_as_columns_matrix)
+        : m_vectors_as_columns_matrix(init_vectors_as_columns_matrix)
     {
     }
 
     Lattice(const LatticeVector& init_a, const LatticeVector& init_b)
-        : vectors_as_columns_matrix(Lattice::vertical_stack(init_a, init_b))
+        : m_vectors_as_columns_matrix(Lattice::vertical_stack(init_a, init_b))
     {
     }
 
-    LatticeVector a() const { return this->vectors_as_columns_matrix.col(0); }
+    const Eigen::Matrix2d& vectors_as_columns() const { return this->m_vectors_as_columns_matrix; }
 
-    LatticeVector b() const { return this->vectors_as_columns_matrix.col(1); }
+    LatticeVector a() const { return this->vectors_as_columns().col(0); }
 
-    const Eigen::Matrix2d& vectors_as_columns() const { return this->vectors_as_columns_matrix; }
+    LatticeVector b() const { return this->vectors_as_columns().col(1); }
+
+private:
+    Eigen::Matrix2d m_vectors_as_columns_matrix;
 
     static Eigen::Matrix2d vertical_stack(const LatticeVector& a, const LatticeVector& b)
     {
@@ -73,9 +76,6 @@ public:
 
         return mat;
     }
-
-private:
-    Eigen::Matrix2d vectors_as_columns_matrix;
 };
 
 /// Return a vector of lattice points by extending the lattice maxsearch times in all directions.
@@ -120,20 +120,20 @@ bool matrix_is_unitary(const Eigen::MatrixXd& mat)
 
 int angle_between_vectors(const Eigen::Vector2d& vec1, const Eigen::Vector2d& vec2)
 {
-    auto radians=std::atan2(vec2(1),vec2(0))-std::atan2(vec1(1),vec1(0));
-    return std::round(radians*(180.0/M_PI));
+    auto radians = std::atan2(vec2(1), vec2(0)) - std::atan2(vec1(1), vec1(0));
+    return std::round(radians * (180.0 / M_PI));
 }
 } // namespace math
 
 namespace sym
 {
-typedef Eigen::Matrix2d Operation;
+typedef Eigen::Matrix2d OperationMatrix;
 
 /// Returns the point group of the given Lattice, i.e. the group of symmetry operations
 /// that maps the lattice onto itself.
-std::vector<Operation> point_group(const xtal::Lattice& lattice)
+std::vector<OperationMatrix> point_group(const xtal::Lattice& lattice)
 {
-    std::vector<Operation> point_group_operations;
+    std::vector<OperationMatrix> point_group_operations;
 
     // This radius should be more than enough
     auto lattice_points = xtal::lattice_points_in_radius(lattice, 5);
@@ -165,73 +165,93 @@ std::vector<Operation> point_group(const xtal::Lattice& lattice)
     return point_group_operations;
 }
 
-/// Enum class to categorize operations as identity, rotation, or reflection
-enum class OPERATION_TYPE {IDENTITY, ROTATION, MIRROR, UNDEFINED};
-
-/// Given a symmetry operation, determine what type of operation it is
-/// by inspecting its determinant
-OPERATION_TYPE categorize_operation(const Operation& operation)
+class Operation
 {
-    auto identity = Eigen::MatrixXd::Identity(operation.rows(), operation.cols());
-
-    if(math::almost_equal(identity,operation))
+public:
+    /// Enum class to categorize operations as identity, rotation, or reflection
+    enum class TYPE
     {
-        return OPERATION_TYPE::IDENTITY;
+        IDENTITY,
+        ROTATION,
+        MIRROR,
+        UNDEFINED
+    };
+
+    Operation(const OperationMatrix& cartesian_matrix) : m_cartesian_matrix(cartesian_matrix), operation_label(make_label(cartesian_matrix)) {}
+
+    const OperationMatrix& cartesian_matrix() const;
+
+private:
+    OperationMatrix m_cartesian_matrix;
+
+    std::string operation_label;
+
+    /// Given a symmetry operation, determine what type of operation it is
+    /// by inspecting its determinant
+    static TYPE categorize(const OperationMatrix& operation)
+    {
+        auto identity = Eigen::MatrixXd::Identity(operation.rows(), operation.cols());
+
+        if (math::almost_equal(identity, operation))
+        {
+            return TYPE::IDENTITY;
+        }
+
+        auto determinant = operation.determinant();
+
+        if (math::almost_equal(determinant, 1))
+        {
+            return TYPE::ROTATION;
+        }
+
+        if (math::almost_equal(determinant, -1))
+        {
+            return TYPE::MIRROR;
+        }
+
+        return TYPE::UNDEFINED;
     }
 
-    auto determinant=operation.determinant();
-
-    if(math::almost_equal(determinant,1))
+    /// Given a symmetry operation matrix, determine the angle associated with it, e.g.
+    /// angle or rotation or mirror, rounded to int (0-360)
+    static int calculate_angle(const OperationMatrix& operation)
     {
-        return OPERATION_TYPE::ROTATION;
+        Eigen::Vector2d ref_vec;
+        ref_vec << 1, 0;
+
+        auto transformed_vec = operation * ref_vec;
+        return math::angle_between_vectors(ref_vec, transformed_vec);
     }
 
-    if(math::almost_equal(determinant,-1))
+    /// Given a symmetry operation, return a string that identifies it by type of operation,
+    /// and the associated angle of rotation/reflection
+    static std::string make_label(const OperationMatrix& operation)
     {
-        return OPERATION_TYPE::MIRROR;
-    }
+        auto type = categorize(operation);
+        auto angle = calculate_angle(operation);
+        auto combine_to_string = [](const std::string& prefix, int angle) { return prefix + std::to_string(angle); };
 
-    return OPERATION_TYPE::UNDEFINED;
-}
-
-/// Given a symmetry operation matrix, determine the angle associated with it, e.g.
-/// angle or rotation or mirror, rounded to int (0-360)
-int angle_of_operation(const Operation& operation)
-{
-    Eigen::Vector2d ref_vec;
-    ref_vec<<1,0;
-
-    auto transformed_vec=operation*ref_vec;
-    return math::angle_between_vectors(ref_vec,transformed_vec);
-}
-
-/// Given a symmetry operation, return a string that identifies it by type of operation,
-/// and the associated angle of rotation/reflection
-std::string label_operation(const Operation& operation)
-{
-    auto type=categorize_operation(operation);
-    auto angle=angle_of_operation(operation);
-    auto combine_to_string=[](const std::string& prefix, int angle){return prefix+std::to_string(angle);};
-
-    std::string label;
-    switch(type)
-    {
-        case OPERATION_TYPE::IDENTITY:
-            label=combine_to_string("I",angle);
+        std::string label;
+        switch (type)
+        {
+        case TYPE::IDENTITY:
+            label = combine_to_string("I", angle);
             break;
-        case OPERATION_TYPE::ROTATION:
-            label=combine_to_string("R",angle);
+        case TYPE::ROTATION:
+            label = combine_to_string("R", angle);
             break;
-        case OPERATION_TYPE::MIRROR:
-            label=combine_to_string("M",angle);
+        case TYPE::MIRROR:
+            label = combine_to_string("M", angle);
             break;
         default:
-            std::cerr<<"Your symmetry operation coudn't be properly categorized. There's no recovering from this"<<std::endl;
+            std::cerr << "Your symmetry operation coudn't be properly categorized. There's no recovering from this"
+                      << std::endl;
             exit(1);
-    }
+        }
 
-    return label;
-}
+        return label;
+    }
+};
 
 } // namespace sym
 
@@ -261,31 +281,31 @@ int main(int argc, char* argv[])
     std::cout << lattice.vectors_as_columns() << std::endl;
 
     std::cout << "--------------" << std::endl;
-    auto point_group=sym::point_group(lattice);
-    std::cout<<point_group.size()<<std::endl;
+    auto point_group = sym::point_group(lattice);
+    std::cout << point_group.size() << std::endl;
 
     std::cout << "--------------" << std::endl;
-    
+
     Eigen::Vector2d x;
     Eigen::Vector2d y;
 
-    x<<1,0;
-    y<<1,0;
-    std::cout<<math::angle_between_vectors(x,y)<<std::endl;
+    x << 1, 0;
+    y << 1, 0;
+    std::cout << math::angle_between_vectors(x, y) << std::endl;
 
-    x<<1,0;
-    y<<0,1;
-    std::cout<<math::angle_between_vectors(x,y)<<std::endl;
+    x << 1, 0;
+    y << 0, 1;
+    std::cout << math::angle_between_vectors(x, y) << std::endl;
 
-    x<<1,0;
-    y<<-1,0;
-    std::cout<<math::angle_between_vectors(x,y)<<std::endl;
+    x << 1, 0;
+    y << -1, 0;
+    std::cout << math::angle_between_vectors(x, y) << std::endl;
 
-    x<<1,1;
-    y<<-1,1;
-    std::cout<<math::angle_between_vectors(x,y)<<std::endl;
+    x << 1, 1;
+    y << -1, 1;
+    std::cout << math::angle_between_vectors(x, y) << std::endl;
 
-    std::cout<<math::angle_between_vectors(lattice.a(),lattice.b())<<std::endl;
+    std::cout << math::angle_between_vectors(lattice.a(), lattice.b()) << std::endl;
 
     std::cout << "--------------" << std::endl;
 
