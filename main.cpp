@@ -117,7 +117,13 @@ namespace math
     {
         return almost_equal(std::abs(mat.determinant()),1);
     }
-    
+
+    //A matrix is unitary if the conjugate transpose is also the inverse
+    bool matrix_is_unitary(const Eigen::MatrixXd& mat)
+    {
+        auto identity=Eigen::MatrixXd::Identity(mat.rows(), mat.cols());
+        return almost_equal(mat*mat.transpose(),identity);
+    }
 }
 
 namespace sym
