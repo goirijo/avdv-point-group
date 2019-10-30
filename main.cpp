@@ -80,5 +80,16 @@ int main(int argc, char* argv[])
         }
     }
 
+    auto multiplication_table=sym::make_multiplication_table(point_group);
+    for(const auto& row : multiplication_table)
+    {
+        for(auto op_ptr : row)
+        {
+            std::cout<<op_ptr->label()<<"    ";
+        }
+
+        std::cout<<std::endl;
+    }
+
     return 0;
 }

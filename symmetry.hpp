@@ -3,6 +3,7 @@
 
 #include "Eigen/Dense"
 #include <set>
+#include <vector>
 
 namespace xtal
 {
@@ -32,6 +33,8 @@ public:
 
     const OperationMatrix& cartesian_matrix() const { return this->m_cartesian_matrix; }
 
+    /// Return label that identifies the symmetry operation as identity, rotation, or mirror, as well
+    /// as the angle associated with the operation
     std::string label() const { return this->operation_label; }
 
     /// Result is simply a direct comparison of the label
@@ -64,7 +67,11 @@ std::set<Operation> point_group(const xtal::Lattice& lattice);
 
 /// Ensure that the symmetry group is closed by multiplying every element by every element
 /// and checking that the result is alrady in the group
-bool group_is_colsed(const std::set<Operation> sym_group);
+bool group_is_colsed(const std::set<Operation>& sym_group);
+
+/// Construct multiplication table of group by storing pointers to each element in the symmetry group
+/// in a two dimensional vector. Group must be closed!
+std::vector<std::vector<const Operation*>> make_multiplication_table(const std::set<Operation>& sym_group);
 
 } // namespace sym
 

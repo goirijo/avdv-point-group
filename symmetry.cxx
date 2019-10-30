@@ -116,20 +116,44 @@ std::set<Operation> point_group(const xtal::Lattice& lattice)
     return point_group_operations;
 }
 
-bool group_is_colsed(const std::set<Operation> sym_group)
+bool group_is_colsed(const std::set<Operation>& sym_group)
 {
     for (const auto op1 : sym_group)
     {
         for (const auto op2 : sym_group)
         {
             auto product = op1 * op2;
-            if(sym_group.find(product)==sym_group.end())
+            if (sym_group.find(product) == sym_group.end())
             {
                 return false;
             }
         }
     }
     return true;
+}
+
+std::vector<std::vector<const Operation*>> make_multiplication_table(const std::set<Operation>& sym_group)
+{
+    std::vector<const Operation*> unrolled_group;
+    for(const auto& op : sym_group)
+    {
+        unrolled_group.push_back(&op);
+    }
+
+    int num_ops=unrolled_group.size();
+    std::vector<std::vector<const Operation*>> multiplication_table(num_ops, std::vector<const Operation*>(num_ops, nullptr));
+
+    for (int i = 0; i < unrolled_group.size(); ++i)
+    {
+        for (int j = 0; j < unrolled_group.size(); ++j)
+        {
+            Operation product=(*unrolled_group[i])*(*unrolled_group[j]);
+            auto product_it=sym_group.find(product);
+            multiplication_table[i][j]=&(*product_it);
+        }
+    }
+
+    return multiplication_table;
 }
 
 } // namespace sym
