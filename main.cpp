@@ -4,6 +4,9 @@
 #include <string>
 #include <vector>
 
+//This will be the tolerance for floating point comparison
+#define EPS 0.00001
+
 namespace io
 {
 std::vector<std::string> _parse_lattice_file(const std::string& file_path)
@@ -98,30 +101,62 @@ std::vector<LatticePoint> lattice_points_in_radius(const Lattice& lat, int searc
 }
 } // namespace xtal
 
-/* namespace sym */
-/* { */
-/*     typedef Eigen::Matrix2d SymOperation; */
+namespace math
+{
+    bool almost_equal(double val1, double val2)
+    {
+        return std::abs(val1-val2)<EPS;
+    }
 
-/*     ///Returns the point group of the given Lattice, i.e. the group of symmetry operations */
-/*     ///that maps the lattice onto itself. */
-/*     std::vector<SymOperation> point_group(const xtal::Lattice& lattice) */
-/*     { */
-/*         std::vector<SymOperation> point_group_operations; */
+    bool almost_equal(const Eigen::MatrixXd& mat1, const Eigen::MatrixXd& mat2)
+    {
+        mat1.isApprox(mat2,EPS);
+    }
 
-/*         //This radius should be more than enough */
-/*         auto lattice_points=xtal::lattice_points_in_radius(lattice, 5); */
+    bool determinant_magnitude_is_unity(const Eigen::MatrixXd& mat)
+    {
+        return almost_equal(std::abs(mat.determinant()),1);
+    }
+    
+}
 
-/*         for(const auto& p1 : lattice_points) */
-/*         { */
-/*             for(const auto& p2 : lattice_points) */
-/*             { */
-/*                 //Create a new lattice from the two points. */
-/*                 //Each of the points effectively defines the a and b vectors of the */
-/*                 //new lattice */
-/*             } */
-/*         } */
-/*     } */
-/* } */
+namespace sym
+{
+    typedef Eigen::Matrix2d SymOperation;
+
+    ///Returns the point group of the given Lattice, i.e. the group of symmetry operations
+    ///that maps the lattice onto itself.
+    std::vector<SymOperation> point_group(const xtal::Lattice& lattice)
+    {
+        std::vector<SymOperation> point_group_operations;
+
+        //This radius should be more than enough
+        auto lattice_points=xtal::lattice_points_in_radius(lattice, 5);
+
+        for(const auto& p1 : lattice_points)
+        {
+            for(const auto& p2 : lattice_points)
+            {
+                //Create a new lattice from the two points.
+                //Each of the points effectively defines the a and b vectors of the
+                //new lattice
+                xtal::Lattice possible_transformed_lattice(p1,p2);
+                //Find the transformation that takes you from the original lattice
+                //to this new lattice. The result is a candidate symmetry operation
+                const auto& orig_lat_mat=lattice.vectors_as_columns();
+                const auto& possible_lat_mat=possible_transformed_lattice.vectors_as_columns();
+                auto possible_symmetry_operation=possible_lat_mat*(orig_lat_mat.inverse());
+
+                //The candidate operation is only valid if its determinant magnitude is unity
+                //AND it is unitary
+                if(std::abs(possible_symmetry_operation.determinant())==1)
+                {
+
+                }
+            }
+        }
+    }
+}
 
 
 
