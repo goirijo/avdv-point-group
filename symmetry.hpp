@@ -14,6 +14,13 @@ namespace sym
 {
 typedef Eigen::Matrix2d OperationMatrix;
 
+/**
+ * The symmetry Operation class is defined by a 2x2 Cartesian
+ * transformation matrix. Given the transformation, a label
+ * is automatically generated to indicate the type of operation
+ * (identity, rotation, or mirror) and an angle associated with it.
+ */
+
 class Operation
 {
 public:
