@@ -87,7 +87,7 @@ int testing(int argc, char* argv[])
     std::cout << lattice.vectors_as_columns() << std::endl;
 
     std::cout << "--------------" << std::endl;
-    auto point_group = sym::point_group(lattice);
+    auto point_group = sym::make_point_group(lattice);
     std::cout << point_group.size() << std::endl;
 
     std::cout << "--------------" << std::endl;
