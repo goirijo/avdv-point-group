@@ -69,7 +69,7 @@ std::string Operation::make_label(const OperationMatrix& operation)
         label = combine_to_string("R", angle);
         break;
     case TYPE::MIRROR:
-        label = combine_to_string("M", angle);
+        label = combine_to_string("M", angle/2);
         break;
     case TYPE::UNDEFINED:
         label = "UNDEFINED";
