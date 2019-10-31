@@ -75,7 +75,7 @@ std::string Operation::make_label(const OperationMatrix& operation)
         label = "UNDEFINED";
         break;
     default:
-        std::cerr << "Your symmetry operation coudn't be properly categorized. There's no recovering from this"
+        std::cerr << "Your symmetry operation coudn't be properly categorized. There's no recovering from this."
                   << std::endl;
         exit(1);
     }
@@ -96,7 +96,7 @@ std::set<Operation> make_point_group(const xtal::Lattice& lattice)
     std::set<Operation> point_group_operations;
 
     // This radius should be more than enough
-    auto lattice_points = xtal::lattice_points_in_radius(lattice, 5);
+    auto lattice_points = xtal::lattice_points_in_radius(lattice, 1);
 
     for (const auto& p1 : lattice_points)
     {
@@ -125,7 +125,7 @@ std::set<Operation> make_point_group(const xtal::Lattice& lattice)
     return point_group_operations;
 }
 
-bool group_is_colsed(const std::set<Operation>& sym_group)
+bool group_is_closed(const std::set<Operation>& sym_group)
 {
     for (const auto op1 : sym_group)
     {

@@ -34,14 +34,14 @@ int main(int argc, char* argv[])
     small_divider();
     for (const auto& op : point_group)
     {
-        std::cout << op.label() << std::endl;
+        std::cout << op << std::endl;
         std::cout << op.cartesian_matrix() << std::endl << std::endl;
         small_divider();
     }
 
     big_divider();
 
-    if (sym::group_is_colsed(point_group))
+    if (sym::group_is_closed(point_group))
     {
         std::cout << "The group is closed." << std::endl;
     }
@@ -126,7 +126,7 @@ int testing(int argc, char* argv[])
     std::cout<<undefined_operation.label()<<std::endl;
     std::cout << "--------------" << std::endl;
 
-    if (sym::group_is_colsed(point_group))
+    if (sym::group_is_closed(point_group))
     {
         std::cout << "The group is closed." << std::endl;
     }

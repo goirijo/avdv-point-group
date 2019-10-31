@@ -76,7 +76,7 @@ std::set<Operation> make_point_group(const xtal::Lattice& lattice);
 
 /// Ensure that the symmetry group is closed by multiplying every element by every element
 /// and checking that the result is alrady in the group
-bool group_is_colsed(const std::set<Operation>& sym_group);
+bool group_is_closed(const std::set<Operation>& sym_group);
 
 /// Construct multiplication table of group by storing pointers to each element in the symmetry group
 /// in a two dimensional vector. Group must be closed!
