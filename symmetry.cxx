@@ -85,7 +85,7 @@ std::string Operation::make_label(const OperationMatrix& operation)
 
 std::ostream& operator<<(std::ostream& stream, const Operation& op)
 {
-    stream<<op.label();
+    stream << op.label();
     return stream;
 }
 
@@ -112,10 +112,9 @@ std::set<Operation> make_point_group(const xtal::Lattice& lattice)
             const auto& possible_lat_mat = possible_transformed_lattice.vectors_as_columns();
             auto possible_symmetry_operation = possible_lat_mat * (orig_lat_mat.inverse());
 
-            // The candidate operation is only valid if its determinant magnitude is unity
-            // AND it is unitary
-            if (math::matrix_determinant_magnitude_is_unity(possible_symmetry_operation) &&
-                math::matrix_is_unitary(possible_symmetry_operation))
+            // The candidate operation is only valid if it is unitary.
+            // This also implies that its determinat is +- 1
+            if (math::matrix_is_unitary(possible_symmetry_operation))
             {
                 point_group_operations.emplace(possible_symmetry_operation);
             }
@@ -143,17 +142,18 @@ bool group_is_closed(const std::set<Operation>& sym_group)
 
 std::vector<std::vector<Operation>> make_multiplication_table(const std::set<Operation>& sym_group)
 {
-    std::vector<Operation> unrolled_group(sym_group.begin(),sym_group.end());
+    std::vector<Operation> unrolled_group(sym_group.begin(), sym_group.end());
 
-    int num_ops=unrolled_group.size();
-    std::vector<std::vector<Operation>> multiplication_table(num_ops, std::vector<Operation>(num_ops,Operation::undefined()));
+    int num_ops = unrolled_group.size();
+    std::vector<Operation> dummy_row(num_ops, Operation::undefined());
+    std::vector<std::vector<Operation>> multiplication_table(num_ops, dummy_row);
 
     for (int i = 0; i < unrolled_group.size(); ++i)
     {
         for (int j = 0; j < unrolled_group.size(); ++j)
         {
-            Operation product=unrolled_group[i]*unrolled_group[j];
-            multiplication_table[i][j]=product;
+            Operation product = unrolled_group[i] * unrolled_group[j];
+            multiplication_table[i][j] = product;
         }
     }
 
