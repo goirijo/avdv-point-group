@@ -13,15 +13,13 @@ typedef Eigen::Vector2d LatticeVector;
 class Lattice
 {
 public:
-    Lattice(const Eigen::Matrix2d& init_vectors_as_columns_matrix)
-        : m_vectors_as_columns_matrix(init_vectors_as_columns_matrix)
-    {
-    }
-
     Lattice(const LatticeVector& init_a, const LatticeVector& init_b)
         : m_vectors_as_columns_matrix(Lattice::vertical_stack(init_a, init_b))
     {
     }
+
+    /// Initialize a lattice by reading the column vectors from a file
+    static Lattice from_file(const std::string& filename);
 
     const Eigen::Matrix2d& vectors_as_columns() const { return this->m_vectors_as_columns_matrix; }
 
@@ -30,6 +28,11 @@ public:
     LatticeVector b() const { return this->vectors_as_columns().col(1); }
 
 private:
+    Lattice(const Eigen::Matrix2d& init_vectors_as_columns_matrix)
+        : m_vectors_as_columns_matrix(init_vectors_as_columns_matrix)
+    {
+    }
+
     Eigen::Matrix2d m_vectors_as_columns_matrix;
 
     //Given two column vectors, create a matrix where they are aligned side by side

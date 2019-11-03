@@ -19,14 +19,14 @@ void small_divider()
 int main(int argc, char* argv[])
 {
     std::string lat_file(argv[1]);
-    auto lattice_mat = io::read_lattice_from_file(lat_file);
-
-    xtal::Lattice lattice(lattice_mat);
+    auto lattice=xtal::Lattice::from_file(lat_file);
 
     std::cout<<"The lattice vectors are:"<<std::endl;
     std::cout << "a:    " << lattice.a().transpose() << std::endl;
     std::cout << "b:    " << lattice.b().transpose() << std::endl;
     big_divider();
+
+    //----------------------------------------------------------------------
 
     auto point_group = sym::make_point_group(lattice);
 
@@ -38,8 +38,9 @@ int main(int argc, char* argv[])
         std::cout << op.cartesian_matrix() << std::endl << std::endl;
         small_divider();
     }
-
     big_divider();
+
+    //----------------------------------------------------------------------
 
     if (sym::group_is_closed(point_group))
     {
@@ -51,6 +52,8 @@ int main(int argc, char* argv[])
         std::cout << "The group is NOT closed!!!" << std::endl;
     }
 
+    //----------------------------------------------------------------------
+
     std::cout<<"The multiplication table is:"<<std::endl;
 
     auto multiplication_table=sym::make_multiplication_table(point_group);
@@ -58,15 +61,15 @@ int main(int argc, char* argv[])
 
     big_divider();
 
+    //----------------------------------------------------------------------
+
     return 0;
 }
 
 int testing(int argc, char* argv[])
 {
     std::string lat_file(argv[1]);
-    auto lattice_mat = io::read_lattice_from_file(lat_file);
-
-    xtal::Lattice lattice(lattice_mat);
+    auto lattice=xtal::Lattice::from_file(lat_file);
 
     std::cout << "a:    " << lattice.a().transpose() << std::endl;
     std::cout << "b:    " << lattice.b().transpose() << std::endl;

@@ -1,7 +1,14 @@
 #include "xtal.hpp"
+#include "io.hpp"
 
 namespace xtal
 {
+Lattice Lattice::from_file(const std::string& filename)
+{
+    auto column_matrix = io::read_matrix2d_from_file(filename);
+    return Lattice(column_matrix);
+}
+
 Eigen::Matrix2d Lattice::vertical_stack(const LatticeVector& a, const LatticeVector& b)
 {
     Eigen::Matrix2d mat;
@@ -12,6 +19,7 @@ Eigen::Matrix2d Lattice::vertical_stack(const LatticeVector& a, const LatticeVec
 
     return mat;
 }
+
 /// Return a vector of lattice points by extending the lattice maxsearch times in all directions.
 /// This is basically just a list of lattice points within a certain radius of the origin,
 /// where the radius is specified by number of unit cells.

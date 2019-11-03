@@ -40,7 +40,7 @@ Operation::TYPE Operation::categorize(const OperationMatrix& operation)
 
 /// Given a symmetry operation matrix, determine the angle associated with it, e.g.
 /// angle or rotation or mirror, rounded to int (0-360)
-int Operation::calculate_angle(const OperationMatrix& operation)
+int _calculate_angle(const OperationMatrix& operation)
 {
     Eigen::Vector2d ref_vec;
     ref_vec << 1, 0;
@@ -51,12 +51,10 @@ int Operation::calculate_angle(const OperationMatrix& operation)
     return positive_angle;
 }
 
-/// Given a symmetry operation, return a string that identifies it by type of operation,
-/// and the associated angle of rotation/reflection
 std::string Operation::make_label(const OperationMatrix& operation)
 {
     auto type = categorize(operation);
-    auto angle = calculate_angle(operation);
+    auto angle = _calculate_angle(operation);
     auto combine_to_string = [](const std::string& prefix, int angle) { return prefix + std::to_string(angle); };
 
     std::string label;
@@ -69,7 +67,7 @@ std::string Operation::make_label(const OperationMatrix& operation)
         label = combine_to_string("R", angle);
         break;
     case TYPE::MIRROR:
-        label = combine_to_string("M", angle/2);
+        label = combine_to_string("M", angle / 2);
         break;
     case TYPE::UNDEFINED:
         label = "UNDEFINED";
@@ -89,35 +87,51 @@ std::ostream& operator<<(std::ostream& stream, const Operation& op)
     return stream;
 }
 
+/// Construct new lattices by taking every possible pair of the given
+/// lattice points, using each lattice point as a lattice vector for the
+/// generated lattice
+std::vector<xtal::Lattice>
+_combine_lattice_points_into_all_possible_lattices(const std::vector<xtal::LatticePoint>& lattice_points)
+{
+    std::vector<xtal::Lattice> candidate_lattices;
+    for (const auto& p1 : lattice_points)
+    {
+        for (const auto& p2 : lattice_points)
+        {
+            candidate_lattices.emplace_back(p1, p2);
+        }
+    }
+
+    return candidate_lattices;
+}
+
 /// Returns the point group of the given Lattice, i.e. the group of symmetry operations
 /// that maps the lattice onto itself.
 std::set<Operation> make_point_group(const xtal::Lattice& lattice)
 {
     std::set<Operation> point_group_operations;
 
-    // This radius should be more than enough
+    // This radius should be just enough. Anything bigger will just give you bigger lattices
     auto lattice_points = xtal::lattice_points_in_radius(lattice, 1);
 
-    for (const auto& p1 : lattice_points)
-    {
-        for (const auto& p2 : lattice_points)
-        {
-            // Create a new lattice from the two points.
-            // Each of the points effectively defines the a and b vectors of the
-            // new lattice
-            xtal::Lattice possible_transformed_lattice(p1, p2);
-            // Find the transformation that takes you from the original lattice
-            // to this new lattice. The result is a candidate symmetry operation
-            const auto& orig_lat_mat = lattice.vectors_as_columns();
-            const auto& possible_lat_mat = possible_transformed_lattice.vectors_as_columns();
-            auto possible_symmetry_operation = possible_lat_mat * (orig_lat_mat.inverse());
+    // Create a new lattice from the two points.
+    // Each of the points effectively defines the a and b vectors of the
+    // new lattice
+    auto possible_transformed_lattices = _combine_lattice_points_into_all_possible_lattices(lattice_points);
 
-            // The candidate operation is only valid if it is unitary.
-            // This also implies that its determinat is +- 1
-            if (math::matrix_is_unitary(possible_symmetry_operation))
-            {
-                point_group_operations.emplace(possible_symmetry_operation);
-            }
+    for (const auto& possible_transformed_lattice : possible_transformed_lattices)
+    {
+        // Find the transformation that takes you from the original lattice
+        // to this new lattice. The result is a candidate symmetry operation
+        const auto& orig_lat_mat = lattice.vectors_as_columns();
+        const auto& possible_lat_mat = possible_transformed_lattice.vectors_as_columns();
+        auto possible_symmetry_operation = possible_lat_mat * (orig_lat_mat.inverse());
+
+        // The candidate operation is only valid if it is unitary.
+        // This also implies that its determinat is +- 1
+        if (math::matrix_is_unitary(possible_symmetry_operation))
+        {
+            point_group_operations.emplace(possible_symmetry_operation);
         }
     }
 

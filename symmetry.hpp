@@ -61,10 +61,6 @@ private:
     /// by inspecting its determinant
     static TYPE categorize(const OperationMatrix& operation);
 
-    /// Given a symmetry operation matrix, determine the angle associated with it, e.g.
-    /// angle or rotation or mirror, rounded to int (0-360)
-    static int calculate_angle(const OperationMatrix& operation);
-
     /// Given a symmetry operation, return a string that identifies it by type of operation,
     /// and the associated angle of rotation/reflection
     static std::string make_label(const OperationMatrix& operation);
