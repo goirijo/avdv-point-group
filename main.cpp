@@ -12,19 +12,27 @@ int main(int argc, char *argv[])
         std::cout << lattice << std::endl;
         
         // Make supergrid
-        auto a_range = std::make_pair(-2, 3);
-        auto b_range = std::make_pair(-2, 3);
+        auto a_range = std::make_pair(-1, 2);
+        auto b_range = std::make_pair(-1, 2);
         auto grid = PointGroupSpace::generate_grid(lattice, a_range, b_range);
+        /*
         std::cout << "My grid:" << std::endl;
         for (auto line : grid)
         {
                 std::cout << line.first << " " << line.second << std::endl;
+        } /**/
+
+        // Find sym ops
+        double tol = 0.00001;
+        std::vector<Eigen::Matrix2d> sym_ops = PointGroupSpace::find_sym_ops(lattice, grid, tol);
+        std::cout << "Number of sym ops: " << sym_ops.size() << std::endl;
+        std::cout << "Sym ops:" << std::endl;
+        for ( auto sym_op : sym_ops)
+        {
+                std::cout << sym_op << "\n" << std::endl;
         }
 
-// Loop over grid and find symops
 
-
-// Check if symop is valid and add to list
 
 
 // Print number of operations in point group, sympos
