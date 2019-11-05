@@ -12,7 +12,14 @@ int main(int argc, char *argv[])
         std::cout << lattice << std::endl;
         
         // Make supergrid
-
+        auto a_range = std::make_pair(-2, 3);
+        auto b_range = std::make_pair(-2, 3);
+        auto grid = PointGroupSpace::generate_grid(lattice, a_range, b_range);
+        std::cout << "My grid:" << std::endl;
+        for (auto line : grid)
+        {
+                std::cout << line.first << " " << line.second << std::endl;
+        }
 
 // Loop over grid and find symops
 
