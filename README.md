@@ -55,6 +55,7 @@ The 12 operations of the lattice are:
 ```
 
 ## Requirements
+- [x] There was an attempt
 - [ ] Written in c++
 - [ ] Final product available through git
 - [ ] Provide a Makefile or bash script that will compile your program
