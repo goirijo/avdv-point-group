@@ -1,12 +1,11 @@
 #include "point_group.hpp"
-//#include "Eigen/Dense"
 #include <iostream>
 
 
 int main(int argc, char *argv[])
 {
         // Read in lattice
-        const std::string file_path = "/home/julija/programming/avdv-point-group/input_lattices/triangular.txt";
+        const std::string file_path = argv[1];
 
         Eigen::Matrix2d lattice = PointGroupSpace::read_lattice(file_path);
         std::cout << "Input lattice:" << std::endl;
