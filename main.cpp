@@ -8,7 +8,6 @@ int main(int argc, char *argv[])
 {
 //*******Reading the lattice**********************
     int x,y;
-    typedef Eigen::Matrix<double, 2, 2> Matrix2f;
     Matrix2f l;
 
     std::ifstream input;
