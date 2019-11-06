@@ -1,7 +1,7 @@
 #include "../eigen-git-mirror/Eigen/Dense"
 #include <list>
 #include "headers.h"
-
+#include <iostream>
 
 std::list<Matrix2f> calc_point_group(const std::list<Matrix2f> lps, const Matrix2f lattice){
     std::list<Matrix2f> SS;

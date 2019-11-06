@@ -2,7 +2,7 @@
 #include <list>
 #include "headers.h"
 
-std::list<Vector2f> calc_grid_points(const int radius, const Matrix2f lattice){
+std::list<Vector2f> calc_grid_points(int radius, const Matrix2f lattice){
 
     Vector2f a,b;
     int i,j;

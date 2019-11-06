@@ -31,10 +31,12 @@ int main(int argc, char *argv[])
 //*******Calculating the list of lprimes************
     std::list<Matrix2f> lprimes;
     lprimes=calc_l_primes(pr);
+
 //**************************************************
 //*****Calculating the list of possible symmetry ops
     std::list<Matrix2f> Ss;
     Ss=calc_point_group(lprimes,l);
+
 //***********Printing out the symmetry ops**********
     std::cout << "***********************" << std::endl;
     std::cout << "The number of operations in the group: " << Ss.size() << std::endl;
