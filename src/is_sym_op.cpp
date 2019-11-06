@@ -2,8 +2,7 @@
 #include "headers.h"
 
 int is_sym_op(const Matrix2f O){
-    float pp = O.determinant();
-    if (pp==1 || pp==-1){
+    if (approximatelyEqualAbsRel(O.determinant(),1,1e-6,1e-6)==true||approximatelyEqualAbsRel(O.determinant(),-1,1e-6,1e-6)==true){
         Matrix2f t;
         t = O.transpose()*O;
     if (t.isIdentity(1e-4)==1){
