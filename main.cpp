@@ -1,11 +1,14 @@
 #include "eigen-git-mirror/Eigen/Dense"
+#include "eigen-git-mirror/Eigen/Core"
 #include <iostream>
 #include <fstream>
 #include <list>
+#include <iomanip>
 #include "src/headers.h"
 
 int main(int argc, char *argv[])
 {
+Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
 //*******Reading the lattice**********************
     int x,y;
     Matrix2f l;
@@ -42,7 +45,7 @@ int main(int argc, char *argv[])
     std::cout << "The number of operations in the group: " << Ss.size() << std::endl;
     std::cout << "***********************" << std::endl;
     for (auto &symops: Ss){
-        std::cout << symops << std::endl;
+        std::cout << symops.format(CleanFmt) << std::endl;
         std::cout << "***********************"<<std::endl;
     }
     return 0;
