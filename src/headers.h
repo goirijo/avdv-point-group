@@ -10,5 +10,6 @@ std::list<Vector2f> calc_grid_points(int radius, const Matrix2f lattice);
 std::list<Matrix2f> calc_l_primes(const std::list<Vector2f> ps);
 std::list<Matrix2f> calc_point_group(const std::list<Matrix2f> lps, const Matrix2f lattice);
 bool approximatelyEqualAbsRel(double a, double b, double absEpsilon, double relEpsilon);
+void mt(const std::list<Matrix2f> sops);
 
 #endif

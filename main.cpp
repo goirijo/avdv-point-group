@@ -40,14 +40,20 @@ Eigen::IOFormat CleanFmt(7, 0, ", ", "\n", "[", "]");
     std::list<Matrix2f> Ss;
     Ss=calc_point_group(lprimes,l);
 
+//**************************************************
 //***********Printing out the symmetry ops**********
-    std::cout << "***********************" << std::endl;
+    std::cout << "******************************************" << std::endl;
     std::cout << "The number of operations in the group: " << Ss.size() << std::endl;
-    std::cout << "***********************" << std::endl;
+    std::cout << "******************************************" << std::endl;
     for (auto &symops: Ss){
         std::cout << symops.format(CleanFmt) << std::endl;
-        std::cout << "***********************"<<std::endl;
+        std::cout << "******************************************"<<std::endl;
     }
+
+//**************************************************
+//**********Checking if the group is closed********
+    mt(Ss);
+
     return 0;
 }
 
