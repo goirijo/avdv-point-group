@@ -8,7 +8,7 @@
 
 int main(int argc, char *argv[])
 {
-Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
+Eigen::IOFormat CleanFmt(7, 0, ", ", "\n", "[", "]");
 //*******Reading the lattice**********************
     int x,y;
     Matrix2f l;
