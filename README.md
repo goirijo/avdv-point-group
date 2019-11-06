@@ -55,22 +55,22 @@ The 12 operations of the lattice are:
 ```
 
 ## Requirements
-* Written in c++
-* Final product available through git
-* Provide a Makefile or bash script that will compile your program
-* Works for any 2D lattice, inputted as a file
-* Prints number of operations in point group
-* Prints the matrix of each point group operation
-* Written by you (no sharing code)
+- [ ] Written in c++
+- [ ] Final product available through git
+- [ ] Provide a Makefile or bash script that will compile your program
+- [ ] Works for any 2D lattice, inputted as a file
+- [ ] Prints number of operations in point group
+- [ ] Prints the matrix of each point group operation
+- [ ] Written by you (no sharing code)
 
 ## Bonus points
-* Well structured code (e.g. delegating tasks to functions or classes)
-* Documentation, or better yet, readable code
-* `const` correctness
-* Use STL
-* Small, incremental commits, not one jumbo commit at the end!
-* Prove results are correct by showing group is closed
-* Print multiplication table of point group
+- [ ] Well structured code (e.g. delegating tasks to functions or classes)
+- [ ] Documentation, or better yet, readable code
+- [ ] `const` correctness
+- [ ] Use STL
+- [ ] Small, incremental commits, not one jumbo commit at the end!
+- [ ] Prove results are correct by showing group is closed
+- [ ] Print multiplication table of point group
 
 ## Pitfalls to look out for
 * Floating point comparisons, think well before using `==` operator
