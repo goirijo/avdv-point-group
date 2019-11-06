@@ -30,8 +30,8 @@ tmp_s_det=(tmp_s[0][0]*tmp_s[1][1]-tmp_s[0][1]*tmp_s[1][0]);
 
 int main()
 {
-    //double lattice[2][2]={{2,0},{0,2}};
-    double lattice[2][2]={{1,-0.5},{0,0.86602540378}};
+    double lattice[2][2]={{2,0},{0,2}};
+    //double lattice[2][2]={{1,-0.5},{0,0.86602540378}};
    
     //just printing the given lattice
     for (int i=0 ;i<2; i=i+1)

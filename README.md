@@ -56,13 +56,13 @@ The 12 operations of the lattice are:
 
 ## Requirements
 - [x] There was an attempt
-- [ ] Written in c++
-- [ ] Final product available through git
-- [ ] Provide a Makefile or bash script that will compile your program
+- [x] Written in c++
+- [x] Final product available through git
+- [x] Provide a Makefile or bash script that will compile your program
 - [ ] Works for any 2D lattice, inputted as a file
 - [ ] Prints number of operations in point group
-- [ ] Prints the matrix of each point group operation
-- [ ] Written by you (no sharing code)
+- [x] Prints the matrix of each point group operation
+- [x] Written by you (no sharing code)
 
 ## Bonus points
 - [ ] Well structured code (e.g. delegating tasks to functions or classes)
