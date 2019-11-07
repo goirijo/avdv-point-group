@@ -42,6 +42,7 @@ Operation::TYPE Operation::categorize(const OperationMatrix& operation)
 /// angle or rotation or mirror, rounded to int (0-360)
 int _calculate_angle(const OperationMatrix& operation)
 {
+    // Reference vector will be (1,0)
     Eigen::Vector2d ref_vec;
     ref_vec << 1, 0;
 
@@ -55,6 +56,8 @@ std::string Operation::make_label(const OperationMatrix& operation)
 {
     auto type = categorize(operation);
     auto angle = _calculate_angle(operation);
+
+    //---- c++ concept: Lambda functions are small anonymous functions meant for small scopes ----//
     auto combine_to_string = [](const std::string& prefix, int angle) { return prefix + std::to_string(angle); };
 
     std::string label;
@@ -81,6 +84,7 @@ std::string Operation::make_label(const OperationMatrix& operation)
     return label;
 }
 
+//---- c++ concept: Operators can be overloaded for any types or classes you make ----//
 std::ostream& operator<<(std::ostream& stream, const Operation& op)
 {
     stream << op.label();
@@ -98,6 +102,7 @@ _combine_lattice_points_into_all_possible_lattices(const std::vector<xtal::Latti
     {
         for (const auto& p2 : lattice_points)
         {
+            //---- c++ concept: "emplace" will construct the object on the spot instead of copying ----//
             candidate_lattices.emplace_back(p1, p2);
         }
     }
@@ -154,6 +159,7 @@ bool group_is_closed(const std::set<Operation>& sym_group)
     return true;
 }
 
+//---- c++ concept: There are several types of containers in the STL, each specialized for different cases ----//
 std::vector<std::vector<Operation>> make_multiplication_table(const std::set<Operation>& sym_group)
 {
     std::vector<Operation> unrolled_group(sym_group.begin(), sym_group.end());

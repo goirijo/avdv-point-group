@@ -10,9 +10,11 @@ namespace xtal
 typedef Eigen::Vector2d LatticePoint;
 typedef Eigen::Vector2d LatticeVector;
 
+//---- c++ concept: Classes combine data and related methods into an object ----//
 class Lattice
 {
 public:
+    //---- c++ concept: Classes usually require constructors ----//
     Lattice(const LatticeVector& init_a, const LatticeVector& init_b)
         : m_vectors_as_columns_matrix(Lattice::vertical_stack(init_a, init_b))
     {

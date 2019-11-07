@@ -3,6 +3,7 @@
 
 #include "Eigen/Dense"
 
+//---- c++ concept: Namespaces can group conceptually related functions and classes together ----//
 namespace math
 {
 bool almost_equal(double val1, double val2);

@@ -5,6 +5,7 @@
 #include <set>
 #include <vector>
 
+//---- c++ concept: Forward declarations allow you to reference a type without including extra headers ----//
 namespace xtal
 {
 class Lattice;
@@ -12,6 +13,7 @@ class Lattice;
 
 namespace sym
 {
+//---- c++ concept: Typedefs are like aliasing one type to another ----//
 typedef Eigen::Matrix2d OperationMatrix;
 
 /**
@@ -24,6 +26,7 @@ typedef Eigen::Matrix2d OperationMatrix;
 class Operation
 {
 public:
+    //---- c++ concept: Enums are like a smarter way to count ----//
     /// Enum class to categorize operations as identity, rotation, or reflection
     enum class TYPE
     {
