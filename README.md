@@ -65,10 +65,10 @@ The 12 operations of the lattice are:
 - [ ] Written by you (no sharing code)
 
 ## Bonus points
-- [ ] Well structured code (e.g. delegating tasks to functions or classes)
+- [x] Well structured code (e.g. delegating tasks to functions or classes)
 - [ ] Documentation, or better yet, readable code
 - [ ] `const` correctness
-- [ ] Use STL
+- [x] Use STL
 - [ ] Small, incremental commits, not one jumbo commit at the end!
 - [ ] Prove results are correct by showing group is closed
 - [ ] Print multiplication table of point group
