@@ -18,6 +18,12 @@ void small_divider()
 
 int main(int argc, char* argv[])
 {
+    if(argc!=2)
+    {
+        std::cout<<"Please provide exactly one file containing a lattice as an argument."<<std::endl;
+        return 1;
+    }
+
     std::string lat_file(argv[1]);
     auto lattice=xtal::Lattice::from_file(lat_file);
 
