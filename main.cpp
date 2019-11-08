@@ -1,6 +1,7 @@
 #include "Eigen/Dense"
 #include <fstream>
 #include <iostream>
+#include <iterator>
 #include <vector>
 
 #define PREC 1e-6 // precision for double comparisons
