@@ -12,7 +12,7 @@ bool is_valid(const Eigen::Matrix2d S)
 //    Eigen::MatrixXd I = Eigen::MatrixXd::Identity(3,3);
     Eigen::Matrix2d sst=S.transpose()*S;
 
-    if (sst.isIdentity()==false){ return false;}
+    if (sst.isIdentity(0.000001)==false){ return false;}
     auto det=S.determinant();
     if((1-abs(det))<.00001){return true;}
     else {return false;}
