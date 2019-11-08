@@ -1,4 +1,5 @@
 #include "Eigen/Dense"
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <iterator>
@@ -56,15 +57,15 @@ std::vector<Eigen::Matrix2d> generate_point_group(const Eigen::Matrix2d& lattice
 {
     std::vector<Eigen::Matrix2d> point_group;
     Eigen::Matrix2d lattice_inv = lattice.inverse();
-    for (auto& lattice_prime : generate_candidate_lattices(lattice))
+    for (const auto& lattice_prime : generate_candidate_lattices(lattice))
     {
         // Compute candidate symop and check validity
-        Eigen::Matrix2d symop = lattice_prime * lattice_inv;
+        const Eigen::Matrix2d symop = lattice_prime * lattice_inv;
         if (is_valid_symop(symop))
         {
             // Check uniqueness against existing symops
             bool unique = true;
-            for (auto& existing : point_group)
+            for (const auto& existing : point_group)
             {
                 if (symop.isApprox(existing, PREC))
                 {
@@ -82,6 +83,32 @@ std::vector<Eigen::Matrix2d> generate_point_group(const Eigen::Matrix2d& lattice
     return point_group;
 }
 
+// Generate the multiplication table for a given point group, determining closure in the process
+Eigen::MatrixXi generate_mult_table(const std::vector<Eigen::Matrix2d>& point_group)
+{
+    const int order = point_group.size();
+    Eigen::MatrixXi mult_table(order, order);
+    for (int i = 0; i < order; i++)
+    {
+        for (int j = 0; j < order; j++)
+        {
+            const Eigen::Matrix2d product = point_group[i] * point_group[j];
+            auto it_k = std::find_if(point_group.begin(), point_group.end(),
+                                     [&](const Eigen::Matrix2d& symop) { return symop.isApprox(product, PREC); });
+            if (it_k != point_group.end())
+            {
+                mult_table(i, j) = it_k - point_group.begin();
+            }
+            else
+            {
+                std::cerr << "Group is not closed" << std::endl;
+                return Eigen::MatrixXi::Constant(order, order, -1);
+            }
+        }
+    }
+    return mult_table;
+}
+
 int main(int argc, char* argv[])
 {
     if (argc == 1)
@@ -93,9 +120,11 @@ int main(int argc, char* argv[])
     std::cout << "Lattice:" << std::endl << lattice << std::endl << std::endl;
     std::vector<Eigen::Matrix2d> point_group = generate_point_group(lattice);
     std::cout << "Point group has " << point_group.size() << " elements:" << std::endl;
-    for (auto& symop : point_group)
+    for (const auto& symop : point_group)
     {
         std::cout << symop << std::endl << std::endl;
     }
+    Eigen::MatrixXi mult_table = generate_mult_table(point_group);
+    std::cout << "Multiplication table:" << std::endl << mult_table << std::endl;
     return 0;
 }
