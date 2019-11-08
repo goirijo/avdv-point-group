@@ -13,8 +13,11 @@ bool is_valid(const Eigen::Matrix2d S)
     Eigen::Matrix2d sst=S.transpose()*S;
 
     if (sst.isIdentity(0.000001)==false){ return false;}
+//    std::cout<<"S.traspose*S=  "<<sst<<endl;
     auto det=S.determinant();
-    if((1-abs(det))<.00001){return true;}
+    if((1-abs(det))<.00001){
+//	    std::cout<<"1-abs(det)= "<< (1-abs(det))<<endl;
+	    return true;}
     else {return false;}
 }
 
@@ -22,7 +25,7 @@ auto create_grid_pts(const Eigen::Matrix2d L)
 {
 //generate a grid of coordinates of points with radius n.
 //each coordinate is vector pair of doubles in a 2n+1 by 2n+1 eigen matrix
-        double n=5.0;
+        double n=3.0;
         int  l=2*n+1;
 	std::vector< std::vector<double>> grid;
 	for(int i=0; i<l;i++){
@@ -82,6 +85,22 @@ auto calc_point_group(const Eigen::Matrix2d L)
 	return SymOps;
 }
 
+bool is_closed(std::vector<Eigen::Matrix2d> group)
+{
+//check is for all elements multiplied by all other elements, the product is in group
+	int n=group.size();
+	Eigen::Matrix2d prod;
+	for(int i=0; i<n; i++){
+		for (int j=0;j<n; j++){
+			prod=group[i]*group[j];
+			if(std::find(group.begin(), group.end(), prod)==group.end()){
+				return false;
+			}
+		}
+	}
+	return true;	
+}
+
 int main(int argc, char *argv[])
 { 
 //main function which reads in lattice from input file and calcualted point group
@@ -91,8 +110,11 @@ int main(int argc, char *argv[])
     std::cout<<"This is the Lattice:"<<endl;
     std::cout<<L<<endl;
     std::vector<Eigen::Matrix2d> pt_grp;
+    bool closed;
 
     pt_grp = calc_point_group(L);
+    closed = is_closed(pt_grp);
+    std::cout<<"This Group is Closed: "<<closed<<endl;
 //    std::cout<<pt_grp.size()<<endl;
     print_ptgroup(pt_grp);
     return 0;
