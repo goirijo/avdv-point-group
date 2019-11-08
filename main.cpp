@@ -77,8 +77,23 @@
  
 
  //
- //  // bool is_group_closed(SymOp SymMatrix); //
- //
+        bool group_is_closed(std::vector<Eigen::Matrix2f> SymMatrix) //
+        {
+	Eigen::Matrix2f GroupMultiplication;
+        for (auto S1: SymMatrix)
+	{
+		for(auto S2:SymMatrix)
+		{
+		    GroupMultiplication=S1*S2;
+		    if (std::find(SymMatrix.begin(), SymMatrix.end(), GroupMultiplication) != SymMatrix.end())
+			    return true;
+		    else if (std::find(SymMatrix.begin(), SymMatrix.end(), GroupMultiplication) == SymMatrix.end())  
+			    return false;
+                }
+        }
+	}
+
+
  //
  //  // void print_mult_table(SymOp SymMatrix)    
 
@@ -119,7 +134,7 @@
 
 int main()
 {
-    auto lattice=Get_Eigen_lattice("input_lattices/ugly.txt");
+    const auto lattice=Get_Eigen_lattice("input_lattices/ugly.txt");
     auto gridpoints=calculate_gridpoints(lattice,5);
     std::cout<<"The lattice we are considering is"<<'\n'<<lattice<<'\n'<<'\n';     	   
     auto Lprimes=Calculate_Lprimes(lattice, 5);
@@ -127,5 +142,11 @@ int main()
     std::cout<<"The valid symmetry operations are:"<<'\n'; 
     for (int i=0; i<validsymops.size();i++)
        std::cout<<validsymops[i] <<'\n'<<'\n';	
-   return 0;
+    
+    if (group_is_closed(validsymops))
+	    std::cout<<"The group is closed!"<<'\n';
+    else
+	    std::cout<<"The group is not closed!"<<'\n';
+    
+    return 0;
 }
