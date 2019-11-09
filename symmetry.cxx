@@ -39,7 +39,7 @@ Operation::TYPE Operation::categorize(const OperationMatrix& operation)
 }
 
 /// Given a symmetry operation matrix, determine the angle associated with it, e.g.
-/// angle or rotation or mirror, rounded to int (0-360)
+/// angle of rotation or mirror, rounded to int (0-360)
 int _calculate_angle(const OperationMatrix& operation)
 {
     // Reference vector will be (1,0)
@@ -110,6 +110,8 @@ _combine_lattice_points_into_all_possible_lattices(const std::vector<xtal::Latti
     return candidate_lattices;
 }
 
+bool Operation::matrix_is_valid(const OperationMatrix& cartesian_matrix) { return math::is_orthogonal(cartesian_matrix); }
+
 /// Returns the point group of the given Lattice, i.e. the group of symmetry operations
 /// that maps the lattice onto itself.
 std::set<Operation> make_point_group(const xtal::Lattice& lattice)
@@ -134,7 +136,7 @@ std::set<Operation> make_point_group(const xtal::Lattice& lattice)
 
         // The candidate operation is only valid if it is unitary.
         // This also implies that its determinat is +- 1
-        if (math::matrix_is_unitary(possible_symmetry_operation))
+        if (Operation::matrix_is_valid(possible_symmetry_operation))
         {
             point_group_operations.emplace(possible_symmetry_operation);
         }

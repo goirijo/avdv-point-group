@@ -55,6 +55,9 @@ public:
     /// Take the product of two operations by multiplying the cartesian matrix
     Operation operator*(const Operation& other) const;
 
+    /// Returns true if the Cartesian matrix is valid for a symmetry operation (i.e. matrix is orthogonal)
+    static bool matrix_is_valid(const OperationMatrix& cartesian_matrix);
+
 private:
     OperationMatrix m_cartesian_matrix;
 
