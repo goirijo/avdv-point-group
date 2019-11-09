@@ -152,7 +152,13 @@ Eigen::Matrix2f Get_Eigen_lattice(std::string filename)
 
 int main(int argc, char *argv[])
 {
+	if (argc<2)
+	{
+		std::cout<<"You;ve made a terrible mistake. Enter text file."<<'\n';
+	        return 1;
+	}
 	std::string filename=argv[1];
+	
 	const auto lattice=Get_Eigen_lattice(filename);
 	auto gridpoints=calculate_gridpoints(lattice,5);
 	std::cout<<"The lattice we are considering is"<<'\n'<<lattice<<'\n'<<'\n';     	   
