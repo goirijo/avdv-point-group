@@ -172,19 +172,20 @@ int main(int argc, char *argv[])
 	std::string filename=argv[1];
 
 	const auto lattice=Get_Eigen_lattice(filename);
-	auto gridpoints=calculate_gridpoints(lattice,2);
+	auto gridpoints=calculate_gridpoints(lattice,1);
 	std::cout<<"The lattice we are considering is"<<'\n'<<lattice<<'\n'<<'\n';     	   
-	auto Lprimes=Calculate_Lprimes(lattice, 2);
+	auto Lprimes=Calculate_Lprimes(lattice, 1);
 		
-	auto validsymops= Calculate_point_group(lattice, 2);  
+	auto validsymops= Calculate_point_group(lattice, 1);  
 	std::cout<<"The valid symmetry operations are:"<<'\n'; 
 	for (int i=0; i<validsymops.size();i++)
-		std::cout<<validsymops[i] <<'\n'<<'\n';	
-
+	 	std::cout<<validsymops[i] <<'\n'<<'\n';	
+                  
 	if (group_is_closed(validsymops))
 		std::cout<<"The group is closed!"<<'\n';
 	else
 		std::cout<<"The group is not closed!"<<'\n';
+	std::cout<<"These are the valid symops"<<'\n'<< validsymops.size()<<'\n';
 
 	return 0;
 }
