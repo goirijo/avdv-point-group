@@ -60,16 +60,16 @@ The 12 operations of the lattice are:
 - [x] Final product available through git
 - [x] Provide a Makefile or bash script that will compile your program
 - [ ] Works for any 2D lattice, inputted as a file
-- [ ] Prints number of operations in point group
+- [x] Prints number of operations in point group
 - [x] Prints the matrix of each point group operation
 - [x] Written by you (no sharing code)
 
 ## Bonus points
-- [ ] Well structured code (e.g. delegating tasks to functions or classes)
+- [x] Well structured code (e.g. delegating tasks to functions or classes)
 - [ ] Documentation, or better yet, readable code
 - [ ] `const` correctness
-- [ ] Use STL
-- [ ] Small, incremental commits, not one jumbo commit at the end!
+- [x] Use STL
+- [x] Small, incremental commits, not one jumbo commit at the end!
 - [ ] Prove results are correct by showing group is closed
 - [ ] Print multiplication table of point group
 
