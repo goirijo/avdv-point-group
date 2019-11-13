@@ -84,11 +84,12 @@ S=latticePrime*lattice.inverse();
 if(is_S_Valid(S,delta))
 {
 cout<<S<<endl<<endl;
+cout<<"######################################################"<<endl;
 numberOfValidS=numberOfValidS+1;
 }
 /////////////////////to here it can also be a function, do we need to write S to file?
   }
-cout<<"Total Number of Valid S:  "<<numberOfValidS;
+cout<<"Total Number of Valid S:  "<<numberOfValidS<<endl;
 
 
 return 0;
