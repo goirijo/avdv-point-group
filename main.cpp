@@ -85,6 +85,18 @@ auto calc_point_group(const Eigen::Matrix2d L)
 	return SymOps;
 }
 
+//contruct functor for find if statement in is_closed
+struct mat_is_same{
+	mat_is_same( Eigen::Matrix2d mat_a) : mat_a(mat_a) {}
+	bool operator()( Eigen::Matrix2d mat_b){
+		if( mat_a.isApprox(mat_b, 0.00001) ){return true;}
+		else return false;
+	}
+private:
+	Eigen::Matrix2d mat_a;
+	double delt;
+};
+
 bool is_closed(std::vector<Eigen::Matrix2d> group)
 {
 //check is for all elements multiplied by all other elements, the product is in group
@@ -93,7 +105,8 @@ bool is_closed(std::vector<Eigen::Matrix2d> group)
 	for(int i=0; i<n; i++){
 		for (int j=0;j<n; j++){
 			prod=group[i]*group[j];
-			if(std::find(group.begin(), group.end(), prod)==group.end()){
+			mat_is_same mat_compare(prod);
+			if(std::find_if(group.begin(), group.end(), mat_compare)==group.end()){
 				return false;
 			}
 		}
