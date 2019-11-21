@@ -8,10 +8,10 @@
 #include "main.cpp"
 
 //Need the factor group for glide planes and screw axes
-//double find_tau(Eigen::Matrix3f Lattice);
-//{
-//  //Find eigenvectors of system. Multipy Eigenvectors by scalar values. If eigenvector applied to lattice points leave it invariant, its one of the top 5 (non-translation based)  operations), if not either no operation or glide/screw axis.
-//}
+double find_tau(Eigen::Matrix3f Lattice) //find point group operations of lattice, candidates, guess all possible translations (need structure due to bases)
+{
+  //Find eigenvectors of system. Multipy Eigenvectors by scalar values. If eigenvector applied to lattice points leave it invariant, its one of the top 5 (non-translation based)  operations), if not either no operation or glide/screw axis.
+}
 
 
 //For a given input structure, find:
@@ -120,9 +120,9 @@ int main()
 
 	const auto lattice=Get_Eigen_lattice(filename);
 	auto validsymops= Calculate_point_group(lattice, 1);
-        vector<vector<double>> high_symmetry_points; //just coords stored together
-        vector<vector<double>> high_symmetry_axes; //points and vector stored together?
-        vector<Eigen::Matrix<float, 2, 3>> high_symmetry_planes;//
+    std::vector<Eigen::Vector3f> high_symmetry_points; //just coords stored together
+    std::vector<Eigen::Vector3f> high_symmetry_axes; //points and vector stored together?
+    std::vector<Eigen::Matrix<float, 2, 3>> high_symmetry_planes;//
         for (auto symOps : validsymops)
 	{
 		if (is_symop_identity(symOps)==true)
@@ -131,17 +131,17 @@ int main()
 		}
 		else if (is_symop_rotation(symOps)==true)
 		{
-                high_symmetry_axes.pushback(symOps.eigenvectors());
+                high_symmetry_axes.push_back(symOps.eigenvectors());
 		//Find vector of rotation axis, store all kpoints along line as high sym points?
 		}
 		else if (is_symop_improper_rotation(symOps)==true)
 		{
-	        high_symmetry_axes.pushback(symOps.eigenvectors());		
+	        high_symmetry_axes.push_back(symOps.eigenvectors());		
                 //Find vector of rotation axis, store all kpoints along line as high sym points?
 		}
 		else if (is_symop_mirror_plane(symOps)==true)		
 		{
-		high_symmetry_planes.pushback(symOps.eigenvectors());
+		high_symmetry_planes.push_back(symOps.eigenvectors());
 		//Find vectors of plane, store all kpoints along line as high sym points?
 		}
 		else if (is_symop_inversion(symOps)==true)
