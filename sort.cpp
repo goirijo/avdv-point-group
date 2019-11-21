@@ -11,20 +11,20 @@ typedef Eigen::EigenSolver<Matrix3f> eigensolver;
 #define PREC 1e-6 //Precision for double comparisions
 
 //creating a symmetry operations class, with a rotation part and a translation part
-class sym_ops{
+class sym_op{
     public:
         Matrix3f coord_matrx;
         Vector3f translation;
         std::string label;
     //Creating a constructor to define the rotation and the translation part
-        sym_ops(Matrix3f r, Vector3f tau){
+        sym_op(Matrix3f r, Vector3f tau){
             coord_matrx = r;
             translation = tau;
         }
 };
 
 //Function to compare doubles
-bool ae(double a, double b, double absEpsilon, double relEpsilon){
+bool compare(double a, double b, double absEpsilon=PREC, double relEpsilon=PREC){
     // Check if the numbers are really close -- needed when comparing numbers near zero.
     double diff{ fabs(a - b)  };
     if (diff <= absEpsilon)
@@ -35,7 +35,7 @@ bool ae(double a, double b, double absEpsilon, double relEpsilon){
 }
 
 //Function to check if the eigen values are equal to one
-int check_eigen_values(sym_ops sym_op_in){
+int check_eigen_values(sym_op sym_op_in){
     
     eigensolver ev(sym_op_in.coord_matrx, false);
     Vector3f evs;
@@ -43,7 +43,7 @@ int check_eigen_values(sym_ops sym_op_in){
     
     int counter=0;
     for (int i=0; i<3; i++){
-       if (evs(i,0)==1){
+       if (compare(evs(i,0),1)){
            counter = counter+1;
         }
     }
@@ -51,10 +51,10 @@ int check_eigen_values(sym_ops sym_op_in){
 }
 
 //Function to check if the translation part of sym op is a lattice translation
-bool is_tau_lattice_translation(sym_ops sym_op_in, Matrix3f lattice){
+bool is_tau_lattice_translation(sym_op sym_op_in, Matrix3f lattice){
     
    //Defining all zeros case to avoid any divisions by zero 
-    if (ae(sym_op_in.translation(0,0),0,PREC,PREC) == true && ae(sym_op_in.translation(1,0),0,PREC,PREC) == true && ae(sym_op_in.translation(2,0),0,PREC,PREC) == true){
+    if (compare(sym_op_in.translation(0,0),0,PREC,PREC) == true && compare(sym_op_in.translation(1,0),0,PREC,PREC) == true && compare(sym_op_in.translation(2,0),0,PREC,PREC) == true){
         return true;
     }
     
@@ -62,45 +62,46 @@ bool is_tau_lattice_translation(sym_ops sym_op_in, Matrix3f lattice){
     Vector3f check_matrix;
     check_matrix = lattice.inverse()*sym_op_in.translation; 
   
-    //Check if those coefficients are integers 
-    if (ae(check_matrix(0,0)-(int)(check_matrix(0,0)),0,PREC,PREC) == true && ae(check_matrix(1,0)-(int)(check_matrix(1,0)),0,PREC,PREC) == true && ae(check_matrix(2,0)-(int)check_matrix(2,0),0,PREC,PREC) == true){
+    //Check if those coefficients are integers
+    //change this part 
+    if (compare(check_matrix(0,0)-static_cast<int>(check_matrix(0,0)),0,PREC,PREC) == true && compare(check_matrix(1,0)-(int)(check_matrix(1,0)),0,PREC,PREC) == true && compare(check_matrix(2,0)-(int)check_matrix(2,0),0,PREC,PREC) == true){
         return true;
     }
     return false;
 }
 
 //Generate labels for various sym ops based on the conditions
-std::vector<sym_ops> label_sym_ops(std::vector<sym_ops> &sym_op_in, Matrix3f lattice){
+std::vector<sym_op> label_sym_ops(std::vector<sym_op> &sym_op_in, Matrix3f lattice){
      
     for (auto &iterator: sym_op_in){
         double det = iterator.coord_matrx.determinant();
         double trace = iterator.coord_matrx.trace();
 
-        if (ae(det,1,PREC,PREC) == true && ae(trace,3,PREC,PREC) == true && is_tau_lattice_translation(iterator,lattice)==true){
+        if (compare(det,1,PREC,PREC) == true && compare(trace,3,PREC,PREC) == true && is_tau_lattice_translation(iterator,lattice)==true){
         iterator.label = "Identity";    
         }
         
-        else if (ae(det,-1,PREC,PREC) == true && ae(trace,-3,PREC,PREC) == true && is_tau_lattice_translation(iterator,lattice)==true){
+        else if (compare(det,-1,PREC,PREC) == true && compare(trace,-3,PREC,PREC) == true && is_tau_lattice_translation(iterator,lattice)==true){
         iterator.label = "Inverse";
         }
         
-        else if (ae(det,1,PREC,PREC) == true && check_eigen_values(iterator)==1 && is_tau_lattice_translation(iterator,lattice) == true){
+        else if (compare(det,1,PREC,PREC) == true && check_eigen_values(iterator)==1 && is_tau_lattice_translation(iterator,lattice) == true){
         iterator.label = "coord_matrx";
         }
         
-        else if (ae(det,-1,PREC,PREC) == true && check_eigen_values(iterator)==1 && is_tau_lattice_translation(iterator,lattice) == true){
+        else if (compare(det,-1,PREC,PREC) == true && check_eigen_values(iterator)==1 && is_tau_lattice_translation(iterator,lattice) == true){
         iterator.label = "Improper coord_matrx";
         }
         
-        else if (ae(det,-1,PREC,PREC) == true && check_eigen_values(iterator)==2 && is_tau_lattice_translation(iterator, lattice) == true){
+        else if (compare(det,-1,PREC,PREC) == true && check_eigen_values(iterator)==2 && is_tau_lattice_translation(iterator, lattice) == true){
         iterator.label = "Mirror";
         }
         
-        else if (ae(det,1,PREC,PREC) == true && check_eigen_values(iterator)==1 && is_tau_lattice_translation(iterator, lattice) == false){
+        else if (compare(det,1,PREC,PREC) == true && check_eigen_values(iterator)==1 && is_tau_lattice_translation(iterator, lattice) == false){
         iterator.label = "Screw";
         }
          
-        else if (ae(det,-1,PREC,PREC) == true && check_eigen_values(iterator)==2 && is_tau_lattice_translation(iterator, lattice) == false){
+        else if (compare(det,-1,PREC,PREC) == true && check_eigen_values(iterator)==2 && is_tau_lattice_translation(iterator, lattice) == false){
         iterator.label = "Glide";
         }
 
@@ -127,10 +128,10 @@ int main(int argc, char *argv[]){
        0,1,0,
        0,0,-1;
     t4 << 1,0,7;
-    std::vector<sym_ops> test,out;
+    std::vector<sym_op> test,out;
     
-    sym_ops x1(t1,t2);
-    sym_ops x2(t3,t4);
+    sym_op x1(t1,t2);
+    sym_op x2(t3,t4);
     
     test.push_back(x1);
     test.push_back(x2);
