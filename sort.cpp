@@ -1,5 +1,5 @@
-#include "../eigen-git-mirror/Eigen/Dense"
-#include "../eigen-git-mirror/Eigen/Eigenvalues"
+#include "eigen-git-mirror/Eigen/Dense"
+#include "eigen-git-mirror/Eigen/Eigenvalues"
 #include <iostream>
 #include <vector>
 #include <cmath>
@@ -13,12 +13,12 @@ typedef Eigen::EigenSolver<Matrix3f> eigensolver;
 //creating a symmetry operations class, with a rotation part and a translation part
 class sym_ops{
     public:
-        Matrix3f rotation;
+        Matrix3f coord_matrx;
         Vector3f translation;
         std::string label;
     //Creating a constructor to define the rotation and the translation part
         sym_ops(Matrix3f r, Vector3f tau){
-            rotation = r;
+            coord_matrx = r;
             translation = tau;
         }
 };
@@ -37,7 +37,7 @@ bool ae(double a, double b, double absEpsilon, double relEpsilon){
 //Function to check if the eigen values are equal to one
 int check_eigen_values(sym_ops sym_op_in){
     
-    eigensolver ev(sym_op_in.rotation, false);
+    eigensolver ev(sym_op_in.coord_matrx, false);
     Vector3f evs;
     evs = ev.eigenvalues().real();
     
@@ -73,32 +73,34 @@ bool is_tau_lattice_translation(sym_ops sym_op_in, Matrix3f lattice){
 std::vector<sym_ops> label_sym_ops(std::vector<sym_ops> &sym_op_in, Matrix3f lattice){
      
     for (auto &iterator: sym_op_in){
-    
-        if (ae(iterator.rotation.determinant(),1,PREC,PREC) == true && ae(iterator.rotation.trace(),3,PREC,PREC) == true && is_tau_lattice_translation(iterator,lattice)==true){
+        double det = iterator.coord_matrx.determinant();
+        double trace = iterator.coord_matrx.trace();
+
+        if (ae(det,1,PREC,PREC) == true && ae(trace,3,PREC,PREC) == true && is_tau_lattice_translation(iterator,lattice)==true){
         iterator.label = "Identity";    
         }
         
-        else if (ae(iterator.rotation.determinant(),-1,PREC,PREC) == true && ae(iterator.rotation.trace(),-3,PREC,PREC) == true && is_tau_lattice_translation(iterator,lattice)==true){
+        else if (ae(det,-1,PREC,PREC) == true && ae(trace,-3,PREC,PREC) == true && is_tau_lattice_translation(iterator,lattice)==true){
         iterator.label = "Inverse";
         }
         
-        else if (ae(iterator.rotation.determinant(),1,PREC,PREC) == true && check_eigen_values(iterator)==1 && is_tau_lattice_translation(iterator,lattice) == true){
-        iterator.label = "Rotation";
+        else if (ae(det,1,PREC,PREC) == true && check_eigen_values(iterator)==1 && is_tau_lattice_translation(iterator,lattice) == true){
+        iterator.label = "coord_matrx";
         }
         
-        else if (ae(iterator.rotation.determinant(),-1,PREC,PREC) == true && check_eigen_values(iterator)==1 && is_tau_lattice_translation(iterator,lattice) == true){
-        iterator.label = "Improper Rotation";
+        else if (ae(det,-1,PREC,PREC) == true && check_eigen_values(iterator)==1 && is_tau_lattice_translation(iterator,lattice) == true){
+        iterator.label = "Improper coord_matrx";
         }
         
-        else if (ae(iterator.rotation.determinant(),-1,PREC,PREC) == true && check_eigen_values(iterator)==2 && is_tau_lattice_translation(iterator, lattice) == true){
+        else if (ae(det,-1,PREC,PREC) == true && check_eigen_values(iterator)==2 && is_tau_lattice_translation(iterator, lattice) == true){
         iterator.label = "Mirror";
         }
         
-        else if (ae(iterator.rotation.determinant(),1,PREC,PREC) == true && check_eigen_values(iterator)==1 && is_tau_lattice_translation(iterator, lattice) == false){
+        else if (ae(det,1,PREC,PREC) == true && check_eigen_values(iterator)==1 && is_tau_lattice_translation(iterator, lattice) == false){
         iterator.label = "Screw";
         }
          
-        else if (ae(iterator.rotation.determinant(),-1,PREC,PREC) == true && check_eigen_values(iterator)==2 && is_tau_lattice_translation(iterator, lattice) == false){
+        else if (ae(det,-1,PREC,PREC) == true && check_eigen_values(iterator)==2 && is_tau_lattice_translation(iterator, lattice) == false){
         iterator.label = "Glide";
         }
 
@@ -139,8 +141,8 @@ int main(int argc, char *argv[]){
         std::cout << "----------------------" << std::endl;
         std::cout << x.label << std::endl;
         std::cout << "----------------------" << std::endl;
-        std::cout << "The rotational part is" << std::endl;
-        std::cout << x.rotation << std::endl;
+        std::cout << "The coord_matrxal part is" << std::endl;
+        std::cout << x.coord_matrx << std::endl;
         std::cout << "The translation part is" << std::endl;
         std::cout << x.translation << std::endl;
     } 
