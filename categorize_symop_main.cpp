@@ -19,7 +19,7 @@ public:
 
 
 
-bool has_translation(Eigen::Vector3d translation, Eigen::Matrix3d lattice)
+bool has_translation(const Eigen::Vector3d translation, const Eigen::Matrix3d lattice)
 { // check if translation is 0 or integer multiple of lattice vectors-> false,
   // else true
   //
@@ -97,10 +97,18 @@ int main(int argc, char* argv[])
 { // WHAT is the actual input????
     // for now, hard coding example sym_ops
 
-    Symmetry_Operation sym_op;
-    Eigen::Vector3d sym_op.translation <<1,0.5,.25;
-    Eigen::Matrix3d sym_op.cart_matrix;
+    Eigen::Vector3d translation;
+    translation<<0.0,0.0,0.5;
+    Eigen::Matrix3d ymirror;
+    ymirror << -1.0, 0.0, 0.0,
+                0.0, 1.0, 0.0,
+                0.0, 0.0, 1.0;
+    Symmetry_Operation sym_op(ymirror,translation);
 
-    std::string op_type = check_op_type(sym_op);
+    Eigen::Matrix3d lattice;
+    lattice<< 3.5, 0.0, 0.0,
+              0.0, 3.5, 0.0,
+              0.0, 0.0, 4.0;
+    std::string op_type = check_op_type(sym_op, lattice);
     std::cout << "This is a " << op_type << std::endl;
 }
