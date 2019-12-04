@@ -1,7 +1,10 @@
 #include "Eigen/Core"
+#include "Eigen/Eigenvalues"
 #include "Eigen/src/Core/Matrix.h"
 #include <iostream>
 #include <vector>
+
+#define PREC 1e-6
 
 class Symmetry_Operation
 {
@@ -22,10 +25,19 @@ bool has_translation(Eigen::Vector3d translation, Eigen::Matrix3d lattice)
   //
 }
 
-int num_eigenvals_equal_one(Eigen::Matrix3d cart_matrix){
+
+
+int num_eigenvals_equal_one(const Eigen::Matrix3d cart_matrix){
     // some function that evaluate eigne vlaue and counts how many ones
-    double det;
-    
+    Eigen::EigenSolver<Eigen::Matrix3d> solver(cart_matrix, false);
+    Eigen::Vector3<std::complex<double>> eigenvals = solver.eigenvalues(); 
+    int eigen_counter =0;
+    for( int i = 0; i<3; i++){
+        if (abs(1-eigenvals(i).real())<PREC){ 
+            if (abs(eigenvals(i).imag())<PREC){eigen_counter++;
+            }}
+    }
+    return eigen_counter;
     /// det (matrix -lambda*identity)==0, lambda is the eigenvalues
 }
 
@@ -76,7 +88,7 @@ std::string check_op_type(Symmetry_Operation sym_op, Eigen::Matrix3d lattice)
     }
     else
     {
-        type = "Error Type not idenitified!!!";
+        type = "Error: Type not idenitified!!!";
         return type;
     }
 }
@@ -86,6 +98,9 @@ int main(int argc, char* argv[])
     // for now, hard coding example sym_ops
 
     Symmetry_Operation sym_op;
+    Eigen::Vector3d sym_op.translation <<1,0.5,.25;
+    Eigen::Matrix3d sym_op.cart_matrix;
+
     std::string op_type = check_op_type(sym_op);
     std::cout << "This is a " << op_type << std::endl;
 }
