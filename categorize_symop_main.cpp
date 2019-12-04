@@ -132,4 +132,5 @@ int main(int argc, char* argv[])
               0.0, 0.0, 4.0;
     std::string op_type = check_op_type(sym_op, lattice);
     std::cout << "This is a " << op_type << std::endl;
+    return 0;
 }
