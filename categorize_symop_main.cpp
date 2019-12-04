@@ -16,16 +16,37 @@ public:
 
 };
 
-
-
-
-bool has_translation(const Eigen::Vector3d translation, const Eigen::Matrix3d lattice)
-{ // check if translation is 0 or integer multiple of lattice vectors-> false,
-  // else true
-  //
-}
-
-
+bool compare_diff_to_prec(Eigen::Vector3d difference) {
+    int sig_diff = 0;
+    for(int i=0;i<3;i++){if (abs(difference(1)) > PREC){sig_diff++;}}
+        if (sig_diff != 0) {
+            return true;
+         }
+         else {
+           return false;
+         }
+ }
+ 
+ bool has_translation(Eigen::Vector3d translation, Eigen::Matrix3d lattice)
+{// check if translation is 0 or integer multiple of lattice vectors-> false,
+    // else true
+    Eigen::Vector3d lattice_displacement = lattice.inverse() * translation;
+    Eigen::Vector3d modification(0.5, 0.5, 0.5);
+    Eigen::Vector3d modif_displ = lattice_displacement + modification;
+    Eigen::Vector3d trunc_displ;
+    
+    for( int i=0; i<3; i++){trunc_displ(i)= (int) modif_displ(i);}
+    Eigen::Vector3d difference = lattice_displacement - trunc_displ;
+    bool check_trans = compare_diff_to_prec(difference);
+    
+    if (check_trans == true) {
+        return true;
+    }
+    else {
+        return false;
+    }
+ }
+ 
 
 int num_eigenvals_equal_one(const Eigen::Matrix3d cart_matrix){
     // some function that evaluate eigne vlaue and counts how many ones
